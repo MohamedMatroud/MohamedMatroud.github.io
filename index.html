@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mohamed Matroud — Senior .NET Developer</title>
+<meta name="description" content="Senior .NET Developer with 5+ years building enterprise ERP, HR, and financial integration systems using ASP.NET Core, C#, EF Core, and SQL Server.">
+<meta name="author" content="Mohamed Matroud Abd El-Hady">
+<!-- Single value, no media query: dark is the default for everyone, so the
+     browser chrome should match it until the visitor chooses otherwise. -->
+<meta name="theme-color" content="#0b0f14">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mohamed Matroud — Senior .NET Developer">
+<meta property="og:description" content="Enterprise backend engineering: ASP.NET Core, Clean Architecture, CQRS, and SQL Server performance. 5+ years across ERP, HR, and financial integration systems.">
+<meta property="og:url" content="https://mohamedmatroud.github.io">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mohamed Matroud — Senior .NET Developer">
+<meta name="twitter:description" content="Enterprise backend engineering: ASP.NET Core, Clean Architecture, CQRS, and SQL Server performance.">
+
+<link rel="canonical" href="https://mohamedmatroud.github.io">
+<!-- Runs before first paint. Three jobs:
+     1. Flag that JavaScript is alive, so the scroll-reveal animation is only ever
+        armed when it can actually run. Without this a script failure would leave
+        every section permanently at opacity:0.
+     2. Apply a saved theme choice BEFORE the body renders, so a returning visitor
+        never sees a flash of the wrong theme. With no saved choice we set nothing
+        and the stylesheet's base — dark — applies to everyone.
+     3. Apply a saved language the same way. Setting lang/dir here rather than
+        later is what prevents a visible left-to-right → right-to-left jump; the
+        text itself is swapped by the script at the end of <body>, which still
+        runs before first paint. -->
+<script>
+(function () {
+  var r = document.documentElement;
+  r.className += " js";
+  try {
+    var t = localStorage.getItem("theme");
+    if (t === "dark" || t === "light") { r.setAttribute("data-theme", t); }
+    if (localStorage.getItem("lang") === "ar") {
+      r.setAttribute("lang", "ar");
+      r.setAttribute("dir", "rtl");
+    }
+  } catch (e) {
+    /* Safari private mode throws on localStorage. Fall through to the defaults. */
+  }
+})();
+</script>
+
+<!-- Teal mark on a white letter: legible against both a light and a dark tab strip. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23096a5b'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+
+<style>
+/* ══════════════════════════════════════════════════════════════════
+   Tokens
+   ══════════════════════════════════════════════════════════════════ */
+:root{
+  /* ── Palette values, declared once ──────────────────────────────────────
+     `--d-*` is the dark set, `--l-*` the light one. Nothing below consumes
+     these directly — the mapping blocks further down decide which set is
+     live, so a colour is only ever written in one place.
+
+     Every foreground value clears WCAG AA (4.5:1) against all three of its
+     own theme's surfaces: page, card, and raised card. */
+
+  /* backgrounds */
+  --d-bg:#0b0f14;                       --l-bg:#f6f8fa;
+  --d-elev:#111820;                     --l-elev:#ffffff;
+  --d-elev-2:#161f2a;                   --l-elev-2:#eceff3;
+
+  /* lines */
+  --d-border:#1e2833;                   --l-border:#dfe5ec;
+  --d-border-lit:#2b3947;               --l-border-lit:#c2ccd8;
+
+  /* text — dark's --text-mute was lifted from #6f8195 so it clears AA on cards */
+  --d-text:#e6edf3;                     --l-text:#0f1720;
+  --d-text-dim:#9fb0c0;                 --l-text-dim:#44566a;
+  --d-text-mute:#788a9f;                --l-text-mute:#5c6e80;
+
+  /* accents — light teals are much deeper; the bright dark-mode teal only
+     reaches 1.6:1 on white and would be unreadable */
+  --d-accent:#4dd4c0;                   --l-accent:#096a5b;
+  --d-accent-dim:#2a9d8a;               --l-accent-dim:#0a7566;
+  --d-accent-hi:#5fe0cc;                --l-accent-hi:#075c50;
+  --d-accent-2:#7aa2f7;                 --l-accent-2:#2555c9;
+  --d-on-accent:#04211d;                --l-on-accent:#ffffff;
+
+  /* translucent derivatives */
+  --d-glow:rgba(77,212,192,.14);        --l-glow:rgba(9,106,91,.10);
+  --d-header-bg:rgba(11,15,20,.82);     --l-header-bg:rgba(246,248,250,.85);
+  --d-ambient-1:rgba(77,212,192,.07);   --l-ambient-1:rgba(9,106,91,.055);
+  --d-ambient-2:rgba(122,162,247,.06);  --l-ambient-2:rgba(37,85,201,.05);
+  --d-a2-soft:rgba(122,162,247,.10);    --l-a2-soft:rgba(37,85,201,.09);
+  --d-a2-line:rgba(122,162,247,.40);    --l-a2-line:rgba(37,85,201,.35);
+
+  /* Light needs elevation shadows: its borders are too faint to separate a
+     card from the page on their own. Dark separates by value alone. */
+  --d-shadow:none;
+  --l-shadow:0 1px 2px rgba(15,23,32,.04), 0 4px 14px rgba(15,23,32,.05);
+
+  /* Type + layout — identical in both themes */
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+
+  --wrap:1080px;
+  /* Vertical rhythm between sections. 104px felt cavernous next to the hero;
+     64px keeps the sections distinct without the dead air. */
+  --gap:clamp(2.25rem,5.5vw,4rem);
+  --radius:12px;
+}
+
+/* ── Theme mapping ────────────────────────────────────────────────────────
+   DARK IS THE BASE — deliberately, and regardless of the visitor's OS setting.
+   This site's identity is the dark terminal look, so every first impression
+   should be that one.
+
+   There is intentionally NO `prefers-color-scheme` rule anywhere in this
+   stylesheet. That absence is the mechanism: a visitor whose machine is set to
+   light mode still opens dark. Adding one back would silently undo this.
+
+   Light applies only when the visitor asks for it with the ☀ toggle, which
+   stamps data-theme="light" and remembers the choice. */
+:root{
+  color-scheme:dark;
+  --bg:var(--d-bg);                 --bg-elev:var(--d-elev);
+  --bg-elev-2:var(--d-elev-2);      --border:var(--d-border);
+  --border-lit:var(--d-border-lit); --text:var(--d-text);
+  --text-dim:var(--d-text-dim);     --text-mute:var(--d-text-mute);
+  --accent:var(--d-accent);         --accent-dim:var(--d-accent-dim);
+  --accent-hi:var(--d-accent-hi);   --accent-2:var(--d-accent-2);
+  --on-accent:var(--d-on-accent);   --glow:var(--d-glow);
+  --header-bg:var(--d-header-bg);   --ambient-1:var(--d-ambient-1);
+  --ambient-2:var(--d-ambient-2);   --accent-2-soft:var(--d-a2-soft);
+  --accent-2-line:var(--d-a2-line); --shadow:var(--d-shadow);
+}
+
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:var(--l-bg);                 --bg-elev:var(--l-elev);
+  --bg-elev-2:var(--l-elev-2);      --border:var(--l-border);
+  --border-lit:var(--l-border-lit); --text:var(--l-text);
+  --text-dim:var(--l-text-dim);     --text-mute:var(--l-text-mute);
+  --accent:var(--l-accent);         --accent-dim:var(--l-accent-dim);
+  --accent-hi:var(--l-accent-hi);   --accent-2:var(--l-accent-2);
+  --on-accent:var(--l-on-accent);   --glow:var(--l-glow);
+  --header-bg:var(--l-header-bg);   --ambient-1:var(--l-ambient-1);
+  --ambient-2:var(--l-ambient-2);   --accent-2-soft:var(--l-a2-soft);
+  --accent-2-line:var(--l-a2-line); --shadow:var(--l-shadow);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+/* The browser's own [hidden]{display:none} is a USER-AGENT rule, and any author
+   `display` declaration beats it regardless of specificity. `.proj` sets
+   display:flex, so `card.hidden = true` was setting the attribute and changing
+   nothing on screen — the pager appeared completely broken. Declared globally
+   and with !important so this trap cannot be reintroduced by a later rule. */
+[hidden]{display:none !important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* Ambient backdrop — pure CSS, no images */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    radial-gradient(900px 500px at 15% -8%, var(--ambient-1), transparent 60%),
+    radial-gradient(760px 480px at 92% 8%, var(--ambient-2), transparent 62%);
+}
+main,header,footer{position:relative;z-index:1}
+
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+.skip{
+  position:absolute;inset-inline-start:-9999px;top:0;
+  background:var(--accent);color:var(--on-accent);
+  padding:.7rem 1.2rem;font-weight:700;z-index:200;
+  border-radius:0;border-end-end-radius:8px;
+}
+.skip:focus{inset-inline-start:0}
+
+.wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:clamp(1.1rem,4vw,2rem)}
+
+/* ══════════════════════════════════════════════════════════════════
+   Nav
+   ══════════════════════════════════════════════════════════════════ */
+header{
+  position:sticky;top:0;z-index:100;
+  background:var(--header-bg);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:62px}
+.brand{font-family:var(--mono);font-weight:700;font-size:.95rem;color:var(--text);letter-spacing:-.02em}
+.brand:hover{text-decoration:none}
+.brand .sig{color:var(--accent)}
+
+.nav-links{display:flex;gap:.35rem;list-style:none;margin:0;padding:0}
+.nav-links a{
+  font-family:var(--mono);font-size:.8rem;color:var(--text-dim);
+  padding:.45rem .7rem;border-radius:7px;display:block;transition:color .18s,background .18s;
+}
+.nav-links a:hover{color:var(--text);background:var(--bg-elev);text-decoration:none}
+.nav-links a.active{color:var(--accent);background:var(--glow)}
+.nav-links .idx{color:var(--accent-dim);margin-inline-end:.35rem}
+
+.nav-actions{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+
+.burger{
+  display:none;background:none;border:1px solid var(--border-lit);color:var(--text);
+  border-radius:8px;padding:.45rem .6rem;cursor:pointer;font-family:var(--mono);font-size:.85rem;
+}
+
+/* Both sit outside .nav-links so they stay reachable on mobile — the burger
+   collapses the section links, not the theme and language controls. */
+.theme-toggle,
+.lang-toggle{
+  background:none;border:1px solid var(--border-lit);color:var(--text-dim);
+  border-radius:8px;cursor:pointer;
+  font-family:var(--mono);font-size:.95rem;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;
+  /* fixed box so swapping ☀ for ☾ (or EN for ع) can't nudge the layout */
+  width:36px;height:34px;padding:0;
+  transition:color .18s,border-color .18s,background .18s;
+}
+/* "EN" is two glyphs where "ع" is one — a little wider, and smaller type. */
+.lang-toggle{width:42px;font-size:.8rem;font-weight:700;letter-spacing:.02em}
+.theme-toggle:hover,
+.lang-toggle:hover{color:var(--accent);border-color:var(--accent);background:var(--glow)}
+
+@media(max-width:760px){
+  .burger{display:block}
+  .nav-links{
+    position:absolute;top:62px;left:0;right:0;
+    flex-direction:column;gap:0;
+    background:var(--bg-elev);border-bottom:1px solid var(--border);
+    padding:.5rem;
+    display:none;
+  }
+  .nav-links.open{display:flex}
+  .nav-links a{padding:.75rem .8rem;font-size:.9rem}
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Sections
+   ══════════════════════════════════════════════════════════════════ */
+section{padding-block:var(--gap);scroll-margin-top:74px}
+
+.sec-head{display:flex;align-items:center;gap:.9rem;margin:0 0 2.5rem}
+.sec-head h2{
+  font-size:clamp(1.4rem,3.4vw,1.9rem);margin:0;letter-spacing:-.02em;
+  white-space:nowrap;font-weight:700;
+}
+.sec-head .num{font-family:var(--mono);color:var(--accent);font-size:.95rem;font-weight:600}
+.sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--border-lit),transparent)}
+
+/* ══════════════════════════════════════════════════════════════════
+   Hero
+   ══════════════════════════════════════════════════════════════════ */
+/* Two columns: text, then the 3D graphic. Grid places items along the inline
+   axis in source order, so Arabic mirrors this for free — text right, graphic
+   left — with no [dir] override. */
+.hero{
+  /* The cap is what removes the dead space under the hero, and padding cannot
+     do it: with align-items:center the leftover is (min-height - content)/2,
+     an expression padding cancels out of entirely. Uncapped it also grows with
+     viewport height, so a tall monitor made the gap worse. */
+  min-height:min(calc(100vh - 62px), 680px);
+  display:grid;
+  /* 260px, not more. The name needs 591px on one line and the role 647px;
+     a wider graphic column pushes both onto two lines, which is a visible
+     regression to the most important text on the page. 260px leaves ~692px,
+     a 45px buffer against font substitution. */
+  grid-template-columns:minmax(0,1fr) minmax(0,260px);
+  gap:clamp(2rem,5vw,4rem);align-items:center;
+  /* Trimmed from clamp(3rem,8vh,5rem). With the min-height capped this is now
+     the last contributor to the space under the hero, so it actually bites. */
+  padding-block:clamp(2rem,5vh,3rem);
+}
+/* ── Hero 3D graphic ──────────────────────────────────────────────────────
+   A layered isometric stack standing for Clean Architecture. Pure CSS
+   transforms — no library, no external request, ~3KB.
+
+   Four nested elements because one element cannot carry three independent
+   transforms: they would overwrite each other on the shared `transform`
+   property. Outer = cursor tilt, then the fixed isometric angle, then the
+   slow spin, then the per-layer depth. */
+.hero-visual{
+  perspective:1100px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1.6rem;
+}
+.iso-tilt{
+  transform-style:preserve-3d;
+  transform:rotateX(var(--ry,0deg)) rotateY(var(--rx,0deg));
+  transition:transform .3s cubic-bezier(.22,.7,.3,1);
+}
+.iso-base{transform-style:preserve-3d;transform:rotateX(56deg)}
+.iso-spin{
+  position:relative;width:190px;height:190px;
+  transform-style:preserve-3d;
+  animation:isoSpin 26s linear infinite;
+}
+@keyframes isoSpin{from{transform:rotateZ(0)}to{transform:rotateZ(360deg)}}
+
+.iso-layer{
+  position:absolute;inset:0;border-radius:16px;
+  border:1px solid var(--accent-dim);
+  background:linear-gradient(135deg,var(--glow),transparent 70%),var(--bg-elev);
+  box-shadow:0 0 22px -8px var(--glow);
+  transform:translateZ(calc(var(--i) * 30px));
+}
+/* Top layer reads as the outermost ring; the deepest is the Domain core. */
+.iso-layer:nth-child(1){border-color:var(--accent);inset:34px}
+.iso-layer:nth-child(2){inset:22px}
+.iso-layer:nth-child(3){inset:11px}
+.iso-layer:nth-child(4){border-color:var(--accent-2)}
+
+.iso-legend{list-style:none;margin:0;padding:0;display:grid;gap:.42rem}
+.iso-legend li{
+  display:flex;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.74rem;color:var(--text-dim);
+}
+.iso-legend .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;background:var(--accent-dim)}
+.iso-legend li:first-child .dot{background:var(--accent)}
+.iso-legend li:last-child .dot{background:var(--accent-2)}
+
+/* Below the content max-width there is no longer room for both the graphic and
+   an unwrapped role line, so the decoration goes rather than the typography.
+   On a phone the hero's job is the name, role, and CTAs anyway.
+
+   This block MUST come after `.hero-visual{display:flex}` above: they have
+   equal specificity, so source order decides. Placed before it, the hide
+   silently loses and the graphic stacks under the text instead. */
+@media(max-width:1080px){
+  .hero{grid-template-columns:1fr}
+  .hero-visual{display:none}
+}
+.term{
+  font-family:var(--mono);font-size:.82rem;color:var(--text-mute);
+  margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+}
+.term .prompt{color:var(--accent)}
+.caret{
+  display:inline-block;width:8px;height:1.05em;background:var(--accent);
+  vertical-align:text-bottom;animation:blink 1.15s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.hero h1{
+  font-size:clamp(2.1rem,7.2vw,4.1rem);line-height:1.05;letter-spacing:-.035em;
+  margin:0 0 .5rem;font-weight:800;
+}
+.hero .role{
+  font-size:clamp(1.1rem,3.4vw,1.75rem);color:var(--text-dim);
+  margin:0 0 1.6rem;font-weight:600;letter-spacing:-.015em;
+}
+.hero .role em{color:var(--accent);font-style:normal}
+.hero p.lede{font-size:clamp(1rem,2.1vw,1.13rem);color:var(--text-dim);max-width:63ch;margin:0 0 2.2rem}
+.hero p.lede strong{color:var(--text);font-weight:600}
+
+.cta{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2.4rem}
+.btn{
+  font-family:var(--mono);font-size:.85rem;font-weight:600;
+  padding:.75rem 1.35rem;border-radius:9px;border:1px solid var(--border-lit);
+  color:var(--text);background:var(--bg-elev);
+  cursor:pointer;transition:border-color .18s,background .18s,transform .18s;
+  display:inline-flex;align-items:center;gap:.5rem;
+}
+.btn:hover{border-color:var(--accent);background:var(--bg-elev-2);text-decoration:none;transform:translateY(-2px)}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
+.btn.primary:hover{background:var(--accent-hi);border-color:var(--accent-hi)}
+
+.quickfacts{display:flex;gap:2.4rem;flex-wrap:wrap;padding-top:1.8rem;border-top:1px solid var(--border)}
+.qf .n{font-family:var(--mono);font-size:1.65rem;font-weight:700;color:var(--accent);line-height:1.1}
+.qf .l{font-size:.78rem;color:var(--text-mute);text-transform:uppercase;letter-spacing:.09em;margin-top:.25rem}
+
+/* ══════════════════════════════════════════════════════════════════
+   About
+   ══════════════════════════════════════════════════════════════════ */
+.about-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:clamp(1.5rem,4vw,3rem);align-items:start}
+@media(max-width:820px){.about-grid{grid-template-columns:1fr}}
+.about-grid p{color:var(--text-dim);margin:0 0 1.15rem}
+.about-grid p:last-child{margin-bottom:0}
+.about-grid strong{color:var(--text);font-weight:600}
+
+.card{
+  background:var(--bg-elev);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);
+}
+.card h3{
+  font-family:var(--mono);font-size:.76rem;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--accent);margin:0 0 1rem;font-weight:700;
+}
+.kv{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-bottom:1px dashed var(--border);font-size:.87rem}
+.kv:last-child{border-bottom:0}
+.kv dt{color:var(--text-mute)}
+.kv dd{margin:0;color:var(--text);text-align:end;font-family:var(--mono);font-size:.83rem}
+
+/* ══════════════════════════════════════════════════════════════════
+   Stack
+   ══════════════════════════════════════════════════════════════════ */
+.stack{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1rem}
+.stack .card h3{display:flex;align-items:center;gap:.5rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{
+  font-family:var(--mono);font-size:.75rem;color:var(--text-dim);
+  background:var(--bg-elev-2);border:1px solid var(--border);
+  padding:.28rem .6rem;border-radius:6px;transition:color .16s,border-color .16s;
+}
+.card:hover .chip{border-color:var(--border-lit)}
+.chip.hot{color:var(--accent);border-color:var(--accent-dim);background:var(--glow)}
+
+/* ══════════════════════════════════════════════════════════════════
+   Experience timeline
+   ══════════════════════════════════════════════════════════════════ */
+.timeline{position:relative;padding-inline-start:1.9rem}
+.timeline::before{
+  content:"";position:absolute;inset-inline-start:5px;top:.7rem;bottom:.7rem;width:2px;
+  background:linear-gradient(180deg,var(--accent-dim),var(--border) 65%,transparent);
+}
+.job{position:relative;padding-bottom:2.6rem}
+.job:last-child{padding-bottom:0}
+.job::before{
+  content:"";position:absolute;inset-inline-start:-1.9rem;top:.55rem;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--accent-dim);
+}
+.job.current::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--glow)}
+
+.job-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:baseline;margin-bottom:.15rem}
+.job h3{font-size:1.12rem;margin:0;letter-spacing:-.015em}
+.job .co{color:var(--accent);font-weight:600}
+.job .when{
+  font-family:var(--mono);font-size:.76rem;color:var(--text-mute);
+  border:1px solid var(--border);border-radius:20px;padding:.15rem .7rem;white-space:nowrap;
+}
+.job .when.now{color:var(--accent);border-color:var(--accent-dim);background:var(--glow)}
+.job ul{margin:.8rem 0 0;padding-inline-start:1.05rem;color:var(--text-dim)}
+.job ul li{margin-bottom:.5rem;padding-inline-start:.2rem}
+.job ul li::marker{color:var(--accent-dim)}
+
+/* ══════════════════════════════════════════════════════════════════
+   Projects
+   ══════════════════════════════════════════════════════════════════ */
+.projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:1.1rem}
+.proj{
+  background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem;display:flex;flex-direction:column;box-shadow:var(--shadow);
+  transition:border-color .2s,transform .2s,background .2s;
+}
+.proj:hover{border-color:var(--border-lit);transform:translateY(-3px);background:var(--bg-elev-2)}
+
+/* Featured project. Spans the full grid width so its much longer description
+   cannot inflate the height of the cards beside it — CSS Grid equalises row
+   height, and a 468-character scope next to a 100-character one left ~300px of
+   dead space in each neighbour. Alone in its row, it sizes to its own content.
+   Only ever card #1, which only ever appears on page 1, so no conditional
+   logic is needed; at mobile widths the grid is single-column already. */
+.proj.feature{
+  grid-column:1 / -1;
+  border-color:var(--accent-dim);
+  border-inline-start:3px solid var(--accent);
+}
+/* At full width a 468-character paragraph would set across ~1000px, which is
+   past readable. Cap the measure; the chips still use the full width. */
+.proj.feature .scope,
+.proj.feature .role{max-width:78ch}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.8rem;margin-bottom:.7rem}
+.proj h3{font-size:1.04rem;margin:0;letter-spacing:-.015em;line-height:1.35}
+.tag{
+  font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--accent);background:var(--glow);border:1px solid var(--accent-dim);
+  padding:.2rem .5rem;border-radius:5px;white-space:nowrap;flex-shrink:0;
+}
+.tag.client{color:var(--accent-2);background:var(--accent-2-soft);border-color:var(--accent-2-line)}
+/* Employer line. Says "at <company>" rather than a bare name because two of
+   these cards also carry a CLIENT badge (Central National Bank, Jotun) — an
+   unlabelled second company would read as ambiguous next to one. */
+.proj-co{
+  font-family:var(--mono);font-size:.75rem;color:var(--text-mute);
+  margin:0 0 .8rem;display:flex;align-items:center;gap:.4rem;
+}
+.proj-co .ci{font-size:.85rem;flex-shrink:0;line-height:1}
+.proj .scope{color:var(--text-dim);font-size:.9rem;margin:0 0 .9rem;flex-grow:1}
+.proj .role{
+  font-size:.84rem;color:var(--text-mute);margin:0 0 1.1rem;
+  padding-inline-start:.75rem;border-inline-start:2px solid var(--border-lit);
+}
+.proj .role b{color:var(--text-dim);font-weight:600}
+/* Inline code (API route names). Isolated in RTL so a Latin path can't reorder. */
+.proj .role code{
+  font-family:var(--mono);font-size:.9em;
+  background:var(--bg-elev-2);border:1px solid var(--border);
+  padding:.05em .35em;border-radius:4px;white-space:nowrap;
+}
+:root[dir="rtl"] .proj .role code{direction:ltr;unicode-bidi:isolate}
+
+/* ── Pager ────────────────────────────────────────────────────────────────
+   The pager carries `hidden` in the markup and is only revealed when the `js`
+   class is present. Without JavaScript all twelve cards stay rendered and this
+   control never appears — content is never trapped behind a dead button. */
+.pager{display:none}
+.js .pager{
+  display:flex;align-items:center;justify-content:center;
+  gap:.5rem;flex-wrap:wrap;margin-top:2.2rem;
+}
+.pager-btn,
+.pager-num{
+  font-family:var(--mono);font-size:.8rem;
+  background:var(--bg-elev);color:var(--text-dim);
+  border:1px solid var(--border);border-radius:8px;
+  padding:.45rem .8rem;cursor:pointer;
+  transition:color .18s,border-color .18s,background .18s;
+}
+.pager-num{min-width:36px;padding:.45rem .6rem}
+.pager-btn:hover:not(:disabled),
+.pager-num:hover:not([aria-current="page"]){
+  color:var(--accent);border-color:var(--accent);background:var(--bg-elev-2);
+}
+.pager-btn:disabled{opacity:.4;cursor:default}
+.pager-num[aria-current="page"]{
+  color:var(--on-accent);background:var(--accent);border-color:var(--accent);font-weight:700;
+}
+.pager-pages{display:flex;gap:.4rem}
+.pager-status{
+  font-family:var(--mono);font-size:.75rem;color:var(--text-mute);
+  text-align:center;margin:.8rem 0 0;
+}
+:root[dir="rtl"] .pager-btn,
+:root[dir="rtl"] .pager-status{font-family:var(--sans-ar)}
+
+/* Page-change fade. Deliberately NOT reusing the .stagger delays: those are
+   keyed to nth-child across all twelve cards, so page 2 would inherit delays
+   from DOM position and cards 10–12 fall outside the 1–9 rules entirely.
+   JS sets the delay per VISIBLE index instead. */
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.js .proj.page-in{animation:pageIn .42s ease both}
+
+/* ══════════════════════════════════════════════════════════════════
+   Education
+   ══════════════════════════════════════════════════════════════════ */
+.edu{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:1rem}
+.edu ul{margin:0;padding-inline-start:1.05rem;color:var(--text-dim);font-size:.9rem}
+.edu ul li{margin-bottom:.55rem}
+.edu ul li::marker{color:var(--accent-dim)}
+.edu ul li:last-child{margin-bottom:0}
+.edu p{margin:0 0 .4rem;color:var(--text-dim);font-size:.9rem}
+.edu .deg{color:var(--text);font-weight:600;font-size:.98rem}
+
+/* ══════════════════════════════════════════════════════════════════
+   Contact
+   ══════════════════════════════════════════════════════════════════ */
+.contact{text-align:center;padding-bottom:calc(var(--gap) * .7)}
+.contact h2{font-size:clamp(1.7rem,5vw,2.6rem);margin:0 0 1rem;letter-spacing:-.03em}
+.contact .num{
+  display:block;font-family:var(--mono);color:var(--accent);
+  font-size:.9rem;margin-bottom:.9rem;font-weight:600;
+}
+.contact p{color:var(--text-dim);max-width:56ch;margin:0 auto 2.2rem}
+.contact .cta{justify-content:center}
+.copied{
+  font-family:var(--mono);font-size:.78rem;color:var(--accent);
+  min-height:1.3em;margin-top:1rem;opacity:0;transition:opacity .2s;
+}
+.copied.show{opacity:1}
+
+/* Phone + address. Static markup, no JS dependency, and built only from
+   existing tokens so it themes for light and dark with no new colours. */
+.contact-details{
+  list-style:none;margin:1.5rem auto 0;padding:0;
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:.7rem 2.2rem;
+  font-family:var(--mono);font-size:.85rem;color:var(--text-dim);
+}
+.contact-details li{display:flex;align-items:center;gap:.55rem;max-width:100%}
+.contact-details .ci{font-size:.95rem;flex-shrink:0;line-height:1}
+.contact-details a{
+  color:var(--text);border-bottom:1px solid var(--accent-dim);
+  transition:color .18s,border-color .18s;
+}
+.contact-details a:hover{color:var(--accent);border-color:var(--accent);text-decoration:none}
+.contact-details .hint{color:var(--text-mute);font-size:.75rem;white-space:nowrap}
+/* The address is the longest unbroken string on the page — let it wrap. */
+.contact-details .addr{text-align:start;overflow-wrap:anywhere}
+
+@media(max-width:560px){
+  .contact-details{flex-direction:column;gap:.9rem}
+  .contact-details li{justify-content:center;text-align:center;flex-wrap:wrap}
+}
+
+footer{
+  border-top:1px solid var(--border);padding-block:2rem;
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:.76rem;color:var(--text-mute);
+}
+footer a{color:var(--text-dim)}
+
+/* ══════════════════════════════════════════════════════════════════
+   Arabic / RTL
+
+   Layout mirroring is handled by logical properties throughout the
+   stylesheet (padding-inline-start, border-inline-start, inset-inline-start,
+   text-align:start/end), so it follows `dir` automatically. Only the things
+   logical properties CANNOT express are overridden here.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* System stack only. An Arabic webfont is 100 KB+ even subset, and this page's
+   zero-external-request property is worth more than the marginal gain. */
+:root{
+  --sans-ar:"Segoe UI","Noto Sans Arabic","Noto Naskh Arabic",Tahoma,"Geeza Pro","Arabic Typesetting",Arial,sans-serif;
+}
+
+:root[dir="rtl"] body{font-family:var(--sans-ar);line-height:1.85}
+:root[dir="rtl"] .hero h1{line-height:1.22}
+
+/* Arabic is cursive. letter-spacing forces gaps between letters that are
+   supposed to JOIN — the result reads as broken, not merely loose. Zero it
+   on every element that will hold Arabic. Latin-only elements are exempted
+   in the rule after next. */
+:root[dir="rtl"] h1,
+:root[dir="rtl"] h2,
+:root[dir="rtl"] h3,
+:root[dir="rtl"] .hero .role,
+:root[dir="rtl"] .qf .l,
+:root[dir="rtl"] .card h3,
+:root[dir="rtl"] .tag,
+:root[dir="rtl"] .job h3,
+:root[dir="rtl"] .contact h2{letter-spacing:normal}
+
+/* Monospaced Arabic is uniformly poor. Elements that use --mono but will hold
+   Arabic switch to the Arabic sans. */
+:root[dir="rtl"] .nav-links a,
+:root[dir="rtl"] .card h3,
+:root[dir="rtl"] .job .when,
+:root[dir="rtl"] .btn,
+:root[dir="rtl"] .tag,
+:root[dir="rtl"] .qf .l,
+:root[dir="rtl"] .sec-head .num,
+:root[dir="rtl"] .contact .num,
+:root[dir="rtl"] .contact-details,
+:root[dir="rtl"] .proj-co,
+:root[dir="rtl"] .copied,
+:root[dir="rtl"] footer{font-family:var(--sans-ar)}
+
+/* Latin islands inside the RTL page keep their monospace identity. */
+:root[dir="rtl"] .chip,
+:root[dir="rtl"] .brand,
+:root[dir="rtl"] .term,
+:root[dir="rtl"] .nav-links .idx,
+:root[dir="rtl"] .kv dd,
+:root[dir="rtl"] .lang-toggle,
+:root[dir="rtl"] .theme-toggle{font-family:var(--mono)}
+
+/* A gradient cannot mirror itself. */
+:root[dir="rtl"] .sec-head .rule{background:linear-gradient(270deg,var(--border-lit),transparent)}
+
+/* Bidi isolation. A Latin or numeric run inside RTL text can reorder on screen;
+   the phone number is the one that actually matters, since a recruiter has to
+   read and dial it. Applied to the phone, email, terminal line, and brand. */
+.ltr{direction:ltr;unicode-bidi:isolate}
+/* .term is a flex row, so alignment is justify-content, not text-align. */
+:root[dir="rtl"] .term{justify-content:flex-end}
+/* .ltr flips text-align:start to the left edge, which would break these out of
+   the RTL column they sit in. Pull them back to the inline-end edge. */
+:root[dir="rtl"] .qf .n{text-align:right}
+
+/* ══════════════════════════════════════════════════════════════════
+   Motion
+   ══════════════════════════════════════════════════════════════════ */
+/* Content is visible by default. The hidden state applies ONLY when the `js`
+   class is present, so no-JS visitors — and the social/crawler renderers that
+   never execute scripts — get the full page instead of a blank one. */
+.js .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.js .reveal.in{opacity:1;transform:none}
+
+/* Staggered children. Keys off `.reveal.in` on the ancestor section, so the
+   IntersectionObserver AND its safety net already drive these — there is no
+   second mechanism that could strand a card invisible. Every transform is
+   translateY, which is direction-neutral and needs no RTL handling. */
+.js .reveal .stagger > *{
+  opacity:0;transform:translateY(14px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.js .reveal.in .stagger > *{opacity:1;transform:none}
+.js .reveal.in .stagger > *:nth-child(1){transition-delay:.04s}
+.js .reveal.in .stagger > *:nth-child(2){transition-delay:.10s}
+.js .reveal.in .stagger > *:nth-child(3){transition-delay:.16s}
+.js .reveal.in .stagger > *:nth-child(4){transition-delay:.22s}
+.js .reveal.in .stagger > *:nth-child(5){transition-delay:.28s}
+.js .reveal.in .stagger > *:nth-child(6){transition-delay:.34s}
+.js .reveal.in .stagger > *:nth-child(7){transition-delay:.40s}
+.js .reveal.in .stagger > *:nth-child(8){transition-delay:.46s}
+.js .reveal.in .stagger > *:nth-child(9){transition-delay:.52s}
+
+/* Hero entrance. Pure CSS on load — no observer, so it cannot be left pending.
+   `both` fill keeps the first frame hidden without a separate initial rule. */
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.js .hero-anim > *{animation:rise .7s cubic-bezier(.22,.7,.3,1) both}
+.js .hero-anim > *:nth-child(1){animation-delay:.05s}
+.js .hero-anim > *:nth-child(2){animation-delay:.14s}
+.js .hero-anim > *:nth-child(3){animation-delay:.23s}
+.js .hero-anim > *:nth-child(4){animation-delay:.32s}
+.js .hero-anim > *:nth-child(5){animation-delay:.41s}
+.js .hero-anim > *:nth-child(6){animation-delay:.50s}
+/* Same reasoning as the pager's clearPageIn: fill-mode:both holds opacity:0
+   if the animation clock never advances, which would blank the entire hero.
+   JS stamps this class once the entrance should have finished. */
+.js .hero-anim.anim-done > *{animation:none;opacity:1;transform:none}
+
+/* Live-role marker on the timeline. */
+@keyframes dotPulse{
+  0%   {box-shadow:0 0 0 0 var(--glow)}
+  70%  {box-shadow:0 0 0 11px transparent}
+  100% {box-shadow:0 0 0 0 transparent}
+}
+.js .job.current::before{animation:dotPulse 2.8s ease-out infinite}
+
+/* Nav underline. transform-origin is the one motion property here that is
+   direction-sensitive — without the RTL override it wipes in backwards. */
+.nav-links a{position:relative}
+.nav-links a::after{
+  content:"";position:absolute;bottom:.22rem;
+  inset-inline:.7rem;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .22s ease;
+}
+:root[dir="rtl"] .nav-links a::after{transform-origin:right}
+.nav-links a:hover::after,
+.nav-links a.active::after{transform:scaleX(1)}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .js .reveal{opacity:1;transform:none}
+  /* The blanket rule above collapses durations but not the start state, so
+     these two need their end state stated outright or they stay invisible. */
+  .js .reveal .stagger > *{opacity:1;transform:none;transition-delay:0s!important}
+  .js .hero-anim > *{animation:none;opacity:1;transform:none}
+  .js .job.current::before{animation:none}
+  .js .proj.page-in{animation:none;opacity:1;transform:none}
+  /* Stack stays rendered and visible — only the motion stops. */
+  .iso-spin{animation:none}
+  .iso-tilt{transition:none}
+  .caret{animation:none}
+}
+
+@media print{
+  body::before,header,.cta,.caret{display:none}
+  body{background:#fff;color:#000}
+  .card,.proj{border-color:#ccc;background:#fff}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
+
+<header>
+  <nav class="wrap nav" aria-label="Primary">
+    <!-- Brand is a Latin wordmark in both languages — isolated so it can't
+         reorder inside the RTL page. -->
+    <a class="brand ltr" href="#top">mohamed<span class="sig">.</span>matroud<span class="sig">()</span></a>
+    <ul class="nav-links" id="navlinks">
+      <li><a href="#about"><span class="idx">01.</span><span data-i18n="nav.about">about</span></a></li>
+      <li><a href="#stack"><span class="idx">02.</span><span data-i18n="nav.stack">stack</span></a></li>
+      <li><a href="#experience"><span class="idx">03.</span><span data-i18n="nav.experience">experience</span></a></li>
+      <li><a href="#projects"><span class="idx">04.</span><span data-i18n="nav.projects">projects</span></a></li>
+      <li><a href="#education"><span class="idx">05.</span><span data-i18n="nav.education">education</span></a></li>
+      <li><a href="#contact"><span class="idx">06.</span><span data-i18n="nav.contact">contact</span></a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="lang-toggle" id="lang-toggle" type="button" lang="ar" aria-label="التبديل إلى العربية">ع</button>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme" title="Switch theme">☀</button>
+      <!-- No data-i18n on the label: it alternates between "menu" and "close",
+           so the JS owns it in both languages via the UI strings table. -->
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="navlinks" data-i18n-aria="nav.menuAria" aria-label="Toggle navigation">≡ menu</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+<div id="top"></div>
+
+<!-- ───────────────────────── HERO ───────────────────────── -->
+<section class="hero wrap" aria-labelledby="hero-name">
+  <div class="hero-anim">
+    <!-- A shell command reads left-to-right in any language. -->
+    <p class="term ltr"><span class="prompt">$</span> dotnet run --project Career.Api<span class="caret" aria-hidden="true"></span></p>
+
+    <h1 id="hero-name" data-i18n="hero.name">Mohamed Matroud</h1>
+    <p class="role" data-i18n-html="hero.role">Senior <em>.NET</em> Developer &nbsp;·&nbsp; Enterprise Backend Engineer</p>
+
+    <p class="lede" data-i18n-html="hero.lede">
+      I build the backend systems enterprises actually run on — <strong>ERP, HR, finance, and
+      asset-management platforms</strong> where an outage halts operations, not a newsfeed.
+      Five-plus years of ASP.NET Core, Clean Architecture, and SQL Server performance work,
+      delivered for clients including <strong>Central National Bank</strong> and <strong>Jotun</strong>.
+    </p>
+
+    <div class="cta">
+      <a class="btn primary" href="#projects" data-i18n="hero.ctaWork">View the work →</a>
+      <!-- Sibling file, not embedded: the page still loads with zero requests
+           because the PDF is only fetched on click, and the CV can be replaced
+           without regenerating this HTML. `download` is honoured because the
+           file is same-origin.
+
+           target="_blank" is a safety net, not the normal path. When `download`
+           is honoured the file saves silently and no tab opens at all — but
+           browsers that ignore it (common on mobile, and with some PDF-preview
+           setups) would otherwise navigate this tab to the PDF and lose the
+           portfolio. -->
+      <a class="btn" href="Mohamed_Matroud_CV.pdf" download target="_blank" rel="noopener noreferrer" data-i18n="cta.downloadCv">↓ Download CV</a>
+      <a class="btn" href="https://github.com/mohamedmatroud" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <a class="btn" href="https://www.linkedin.com/in/mohamed-matroud-75ba5a16b" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+    </div>
+
+    <!-- The .n values stay Latin/numeric and are bidi-isolated: without it,
+         "5+" renders as "+5" and ".NET 10" as "10 NET." inside an RTL page. -->
+    <!-- data-count-to is explicit rather than parsed from the text, because
+         the fourth stat is ".NET 10" and must not be counted. -->
+    <div class="quickfacts">
+      <div class="qf"><div class="n ltr" data-count-to="5" data-count-suffix="+">5+</div><div class="l" data-i18n="hero.qfYears">Years .NET</div></div>
+      <!-- "Projects delivered", not "Production systems": three of the twelve
+           are freelance front-end contracts and would not survive that label. -->
+      <div class="qf"><div class="n ltr" data-count-to="13">13</div><div class="l" data-i18n="hero.qfSystems">Projects delivered</div></div>
+      <div class="qf"><div class="n ltr" data-count-to="4">4</div><div class="l" data-i18n="hero.qfDomains">Enterprise domains</div></div>
+      <div class="qf"><div class="n ltr">.NET 10</div><div class="l" data-i18n="hero.qfStack">Current stack</div></div>
+    </div>
+  </div>
+
+  <!-- Decorative only, so aria-hidden. The rotation is pure CSS: if JS never
+       runs the stack still renders and still turns, and only the cursor tilt
+       is lost. Nothing here is load-bearing for visibility.
+       --i sets the depth: 3 is the top (smallest) layer, 0 the base. Layer
+       names stay Latin in Arabic, matching the tech-chip policy. -->
+  <div class="hero-visual" aria-hidden="true">
+    <div class="iso-tilt" id="iso-tilt">
+      <div class="iso-base">
+        <div class="iso-spin">
+          <div class="iso-layer" style="--i:3"></div>
+          <div class="iso-layer" style="--i:2"></div>
+          <div class="iso-layer" style="--i:1"></div>
+          <div class="iso-layer" style="--i:0"></div>
+        </div>
+      </div>
+    </div>
+    <ul class="iso-legend">
+      <li><span class="dot"></span>API</li>
+      <li><span class="dot"></span>Application</li>
+      <li><span class="dot"></span>Domain</li>
+      <li><span class="dot"></span>Infrastructure</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────────────────────── ABOUT ───────────────────────── -->
+<section id="about" class="wrap reveal" aria-labelledby="h-about">
+  <div class="sec-head"><span class="num">01.</span><h2 id="h-about" data-i18n="about.title">About</h2><span class="rule"></span></div>
+
+  <div class="about-grid">
+    <div>
+      <p data-i18n-html="about.p1">
+        Over five-plus years as a .NET developer I've moved from shipping features to owning
+        architecture. Today I <strong>lead backend architecture, API development, and database
+        performance tuning</strong> for a multi-module enterprise ERP platform spanning finance,
+        inventory, procurement, and HR — designing each module with Clean Architecture and SOLID
+        principles so the system stays extensible instead of ossifying after its first release.
+      </p>
+      <p data-i18n-html="about.p2">
+        My work sits where three things meet: <strong>architecture that survives its second
+        year</strong>, <strong>APIs that stay fast under real load</strong>, and <strong>SQL Server
+        schemas that don't collapse when the data volume arrives</strong>. That means modular
+        monolith and Clean Architecture design, CQRS, and DDD building blocks applied to real
+        production systems — not to side projects.
+      </p>
+      <p data-i18n="about.p3">
+        I've also spent a lot of time on the unglamorous half of enterprise work: modernizing
+        legacy APIs that can't be rewritten, integrating Oracle systems into .NET applications,
+        keeping POS, accounting, and inventory platforms in real-time sync, and wiring a customer
+        e-invoicing platform into a national tax-compliance system in Saudi Arabia. Systems with
+        regulators attached teach you to care about correctness in a way greenfield work doesn't.
+      </p>
+      <p data-i18n-html="about.p4">
+        I'm currently open to <strong>Senior Backend .NET</strong> and <strong>.NET Architect</strong>
+        roles — on-site, hybrid, or remote.
+      </p>
+    </div>
+
+    <aside class="card">
+      <h3 data-i18n="about.glance">At a glance</h3>
+      <dl style="margin:0">
+        <div class="kv"><dt data-i18n="about.kRole">Current role</dt><dd data-i18n="about.vRole">Senior .NET Dev</dd></div>
+        <div class="kv"><dt data-i18n="about.kExp">Experience</dt><dd data-i18n="about.vExp">5+ years</dd></div>
+        <div class="kv"><dt data-i18n="about.kStack">Core stack</dt><dd>ASP.NET Core</dd></div>
+        <div class="kv"><dt data-i18n="about.kDb">Database</dt><dd>SQL Server</dd></div>
+        <div class="kv"><dt data-i18n="about.kArch">Architecture</dt><dd>Clean · CQRS</dd></div>
+        <div class="kv"><dt data-i18n="about.kFront">Frontend</dt><dd>Angular</dd></div>
+        <div class="kv"><dt data-i18n="about.kDegree">Degree</dt><dd data-i18n="about.vDegree">BSc Computer Science</dd></div>
+        <div class="kv"><dt data-i18n="about.kArabic">Arabic</dt><dd data-i18n="about.vArabic">Native</dd></div>
+        <div class="kv"><dt data-i18n="about.kEnglish">English</dt><dd data-i18n="about.vEnglish">Professional</dd></div>
+        <div class="kv"><dt data-i18n="about.kAvail">Availability</dt><dd data-i18n="about.vAvail">Open to roles</dd></div>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<!-- ───────────────────────── STACK ───────────────────────── -->
+<section id="stack" class="wrap reveal" aria-labelledby="h-stack">
+  <div class="sec-head"><span class="num">02.</span><h2 id="h-stack" data-i18n="stack.title">Technical Stack</h2><span class="rule"></span></div>
+
+  <!-- Chip policy: product names and established pattern names (C#, EF Core,
+       CQRS, SOLID, Repository…) stay Latin — that is the norm in Arabic
+       technical writing and keeps them searchable. Generic descriptive
+       phrases ("Stored procedures", "Unit testing") do get translated. -->
+  <div class="stack stagger">
+    <div class="card">
+      <h3 data-i18n="stack.langs">Languages &amp; Runtime</h3>
+      <div class="chips">
+        <span class="chip hot">C# 10 / 11</span><span class="chip hot">.NET 6 / 7 / 8 / 9 / 10</span>
+        <span class="chip">TypeScript</span><span class="chip">JavaScript ES6+</span><span class="chip">T-SQL</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.backend">Backend Frameworks</h3>
+      <div class="chips">
+        <span class="chip hot">ASP.NET Core</span><span class="chip hot">Web API</span>
+        <span class="chip">ASP.NET MVC</span><span class="chip">Minimal APIs</span>
+        <span class="chip hot">EF Core</span><span class="chip">Dapper</span><span class="chip">LINQ</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.arch">Architecture &amp; Patterns</h3>
+      <div class="chips">
+        <span class="chip hot">Clean Architecture</span><span class="chip hot">Modular Monolith</span>
+        <span class="chip hot">CQRS</span><span class="chip">SOLID</span><span class="chip" data-i18n="chip.ddd">DDD concepts</span>
+        <span class="chip">Repository</span><span class="chip">Unit of Work</span>
+        <span class="chip">Mediator</span><span class="chip" data-i18n="chip.di">Dependency Injection</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.api">API &amp; Security</h3>
+      <div class="chips">
+        <span class="chip hot" data-i18n="chip.restDesign">RESTful API design</span><span class="chip hot">JWT</span>
+        <span class="chip">OAuth 2.0</span><span class="chip">ASP.NET Identity</span>
+        <span class="chip" data-i18n="chip.versioning">API versioning</span><span class="chip">Swagger / OpenAPI</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.db">Databases</h3>
+      <div class="chips">
+        <span class="chip hot">SQL Server</span><span class="chip" data-i18n="chip.sprocs">Stored procedures</span>
+        <span class="chip" data-i18n="chip.indexing">Indexing strategy</span><span class="chip" data-i18n="chip.queryOpt">Query optimization</span>
+        <span class="chip" data-i18n="chip.schema">Schema design</span><span class="chip" data-i18n="chip.migrations">EF Core migrations</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.frontend">Frontend</h3>
+      <div class="chips">
+        <span class="chip hot">Angular</span><span class="chip">HTML5</span><span class="chip">CSS3</span>
+        <span class="chip">Bootstrap 5</span><span class="chip">jQuery</span>
+        <span class="chip">AJAX</span><span class="chip" data-i18n="chip.responsive">Responsive design</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.testing">Testing &amp; Quality</h3>
+      <div class="chips">
+        <span class="chip">xUnit</span><span class="chip">NUnit</span><span class="chip">Moq</span>
+        <span class="chip" data-i18n="chip.unitTest">Unit testing</span><span class="chip" data-i18n="chip.intTest">Integration testing</span><span class="chip" data-i18n="chip.reviews">Code reviews</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.devops">DevOps &amp; Tooling</h3>
+      <div class="chips">
+        <span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">GitLab</span>
+        <span class="chip">Azure DevOps</span><span class="chip" data-i18n="chip.iis">IIS deployment</span><span class="chip" data-i18n="chip.envcfg">Environment config</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="stack.logging">Logging, Reporting &amp; Integration</h3>
+      <div class="chips">
+        <span class="chip">Serilog</span><span class="chip" data-i18n="chip.audit">Custom audit logging</span>
+        <span class="chip">Crystal Reports</span><span class="chip">Stimulsoft</span>
+        <span class="chip" data-i18n="chip.oracle">Oracle integration</span><span class="chip" data-i18n="chip.sync">Real-time data sync</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────────────── EXPERIENCE ───────────────────────── -->
+<section id="experience" class="wrap reveal" aria-labelledby="h-exp">
+  <div class="sec-head"><span class="num">03.</span><h2 id="h-exp" data-i18n="exp.title">Experience</h2><span class="rule"></span></div>
+
+  <!-- Employer names are transliterated in Arabic with the Latin original kept
+       in parentheses: a recruiter cannot search or verify a company they can
+       only see in transliteration. -->
+  <div class="timeline stagger">
+
+    <article class="job current">
+      <div class="job-head">
+        <h3 data-i18n-html="exp.j1title">Senior .NET Developer &nbsp;<span class="co">· Dynamic Business Solution</span></h3>
+        <span class="when now" data-i18n="exp.j1when">Mar 2025 — Present</span>
+      </div>
+      <ul>
+        <li data-i18n="exp.j1b1">Lead backend architecture, RESTful API development, and SQL Server performance tuning for a multi-module enterprise ERP platform covering finance, inventory, procurement, and HR.</li>
+        <li data-i18n="exp.j1b2">Design and implement new ERP modules using modular architecture principles, applying SOLID and proven design patterns to ensure scalability and maintainability.</li>
+        <li data-i18n="exp.j1b3">Modernize and harden legacy APIs to improve performance, security, and reliability through targeted refactoring and query optimization.</li>
+        <li data-i18n="exp.j1b4">Build RESTful APIs with ASP.NET Core and Web API using dependency injection and clean separation of concerns.</li>
+        <li data-i18n="exp.j1b5">Design and optimize SQL Server databases — stored procedures, indexes, and schema tuning for high-throughput operations.</li>
+        <li data-i18n="exp.j1b6">Contribute to architectural planning, requirements analysis, and technical decisions for reusable, extensible modules.</li>
+      </ul>
+    </article>
+
+    <article class="job">
+      <div class="job-head">
+        <h3 data-i18n-html="exp.j2title">Full-Stack Developer &nbsp;<span class="co">· Ultimate Solutions</span></h3>
+        <span class="when" data-i18n="exp.j2when">Nov 2023 — Mar 2025</span>
+      </div>
+      <ul>
+        <li data-i18n="exp.j2b1">Delivered end-to-end solutions spanning frontend and backend for finance and restaurant-management clients, including systems deployed in the Saudi Arabia market.</li>
+        <li data-i18n="exp.j2b2">Designed and developed RESTful services using ASP.NET Core and Web API, applying OOP principles and design patterns to maintain clean, testable code.</li>
+        <li data-i18n="exp.j2b3">Performed relational database design and management in SQL Server, including stored procedures and query optimization.</li>
+        <li data-i18n="exp.j2b4">Integrated Angular, jQuery, AJAX, and JSON with backend services to deliver a seamless user experience.</li>
+        <li data-i18n="exp.j2b5">Contributed to the design of cross-system APIs enabling reliable integration across multiple platforms.</li>
+      </ul>
+    </article>
+
+    <article class="job">
+      <div class="job-head">
+        <h3 data-i18n-html="exp.j3title">.NET Developer &nbsp;<span class="co">· GBS — Global Barcode Solution</span></h3>
+        <span class="when" data-i18n="exp.j3when">Feb 2021 — Oct 2023</span>
+      </div>
+      <ul>
+        <li data-i18n="exp.j3b1">Delivered end-to-end enterprise systems for asset management, warehouse control, and operations across web, mobile, and desktop for clients including Central National Bank and Jotun.</li>
+        <li data-i18n="exp.j3b2">Developed and maintained full-stack solutions using ASP.NET, ASP.NET Core, MVC, Telerik UI, SQL Server, Web API, AJAX, and Crystal Reports.</li>
+        <li data-i18n="exp.j3b3">Designed RESTful APIs supporting cross-platform integration between web, desktop, and mobile clients.</li>
+        <li data-i18n="exp.j3b4">Conducted database design and optimization for enterprise-grade SQL Server deployments.</li>
+        <li data-i18n="exp.j3b5">Integrated external systems including Oracle into custom .NET applications.</li>
+      </ul>
+    </article>
+
+    <article class="job">
+      <div class="job-head">
+        <h3 data-i18n-html="exp.j4title">Freelance Front-End Developer &nbsp;<span class="co">· Independent</span></h3>
+        <span class="when" data-i18n="exp.j4when">May 2018 — May 2020</span>
+      </div>
+      <ul>
+        <li data-i18n="exp.j4b1">Built client-facing interfaces and integrated third-party APIs into the UI across multiple web applications.</li>
+        <li data-i18n="exp.j4b2">Delivered Ajwal, a B2B travel booking portal connecting third-party hotel, flight, and train reservation APIs.</li>
+        <li data-i18n="exp.j4b3">Converted PSD designs into responsive, cross-browser web pages and improved the visual quality of existing client sites.</li>
+        <li data-i18n="exp.j4b4">Consumed REST APIs with AJAX and resolved front-end defects across client projects.</li>
+      </ul>
+    </article>
+
+  </div>
+</section>
+
+<!-- ───────────────────────── PROJECTS ───────────────────────── -->
+<section id="projects" class="wrap reveal" aria-labelledby="h-proj">
+  <div class="sec-head"><span class="num">04.</span><h2 id="h-proj" data-i18n="proj.title">Selected Projects</h2><span class="rule"></span></div>
+
+  <div class="projects stagger">
+
+    <!-- Flagship, deliberately first: multi-tenant, split-deployment, .NET 8 +
+         React 18. It is the strongest thing on the page. -->
+    <article class="proj feature">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p13name">Nova Visitors — Community Access Platform</h3>
+        <span class="tag" data-i18n="proj.p13tag">Multi-tenant</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p13co">at Dynamic Business Solution</span></p>
+      <p class="scope" data-i18n="proj.p13scope">A full-stack platform for gated communities covering owner registration, resident authentication, unit / person / visit records, and administrative dashboards. Ships as a split deployment — a per-village server holding local data plus a shared central registry that syncs owner identities and cross-village reporting over HTTP, with every village isolated to its own SQL Server database. Adds polygon geofencing, device-bound activation, and a bilingual RTL interface.</p>
+      <p class="role" data-i18n-html="proj.p13role"><b>My contribution:</b> backend and frontend developer — designed the split-deployment dependency injection, built the <code>/CentralOwnerSync</code> HTTP surface, added the persons filter page, and delivered the bilingual RTL rework.</p>
+      <div class="chips">
+        <span class="chip hot">.NET 8</span><span class="chip hot">ASP.NET Core</span><span class="chip">EF Core 8</span><span class="chip">SQL Server 2022</span><span class="chip hot">React 18</span><span class="chip">Vite</span><span class="chip">MUI v7</span><span class="chip">JWT</span><span class="chip hot">Docker</span><span class="chip">NetTopologySuite</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p1name">Enterprise ERP Platform</h3>
+        <span class="tag" data-i18n="proj.p1tag">From scratch</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p1co">at Dynamic Business Solution</span></p>
+      <p class="scope" data-i18n="proj.p1scope">A complete ERP solution spanning finance, inventory, procurement, and HR business functions — built from the ground up rather than extended from a template.</p>
+      <p class="role" data-i18n-html="proj.p1role"><b>My contribution:</b> defined data models, designed backend logic, built the APIs, and supported frontend integration.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">Web API</span><span class="chip">EF Core</span><span class="chip">SQL Server</span><span class="chip">Git</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p2name">Nova HR System</h3>
+        <span class="tag" data-i18n="proj.p2tag">HR platform</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p2co">at Dynamic Business Solution</span></p>
+      <p class="scope" data-i18n="proj.p2scope">A full-featured HR platform managing attendance, leave, payroll, onboarding, and internal transfers.</p>
+      <p class="role" data-i18n-html="proj.p2role"><b>My contribution:</b> modeled core domain entities, authored business logic, enhanced features, and resolved critical production defects.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">Web API</span><span class="chip">EF Core</span><span class="chip">SQL Server</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p3name">E-Invoice Integration Platform</h3>
+        <span class="tag" data-i18n="proj.p3tag">Saudi Arabia</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p3co">at Ultimate Solutions</span></p>
+      <p class="scope" data-i18n="proj.p3scope">Customer invoice creation and management, integrated with a national real-time tracking system for tax compliance — a regulated integration where a malformed payload is a compliance failure, not a bug ticket.</p>
+      <p class="role" data-i18n-html="proj.p3role"><b>My contribution:</b> owned frontend development and API design, ensuring reliable data flow between the platform and external regulatory systems.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">Web API</span><span class="chip">Angular</span><span class="chip">SQL Server</span><span class="chip">Bootstrap</span><span class="chip">Stimulsoft</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p4name">Restaurant POS Integration</h3>
+        <span class="tag" data-i18n="proj.p4tag">Real-time sync</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p4co">at Ultimate Solutions</span></p>
+      <p class="scope" data-i18n="proj.p4scope">Integration of a restaurant point-of-sale system with centralized accounting and inventory platforms.</p>
+      <p class="role" data-i18n-html="proj.p4role"><b>My contribution:</b> designed and implemented the APIs enabling real-time synchronization of sales, accounting, and inventory data — improving operational visibility across systems.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">Web API</span><span class="chip">SQL Server</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p5name">Asset Auditing System</h3>
+        <span class="tag client" data-i18n="proj.p5tag">Central National Bank</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p5co">at GBS — Global Barcode Solution</span></p>
+      <p class="scope" data-i18n="proj.p5scope">An enterprise asset-management solution tracking organizational assets across three interconnected client platforms — web, mobile, and desktop.</p>
+      <p class="role" data-i18n-html="proj.p5role"><b>My contribution:</b> full-stack development, API design, and cross-system integration across all three platforms.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">MVC</span><span class="chip">Telerik UI</span><span class="chip">Web API</span><span class="chip">SQL Server</span><span class="chip">Crystal Reports</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p6name">Warehouse Control System</h3>
+        <span class="tag client" data-i18n="proj.p6tag">Jotun</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p6co">at GBS — Global Barcode Solution</span></p>
+      <p class="scope" data-i18n="proj.p6scope">QR and barcode design paired with warehouse operations management, delivered across web and desktop applications.</p>
+      <p class="role" data-i18n-html="proj.p6role"><b>My contribution:</b> owned full-stack development across both the web and desktop applications.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">MVC</span><span class="chip">Telerik UI</span><span class="chip">Web API</span><span class="chip">SQL Server</span><span class="chip">Crystal Reports</span>
+      </div>
+    </article>
+
+    <!-- ── page 2 ───────────────────────────────────────────────────────
+         Everything below is hidden by the pager on load. The hiding is done
+         in JS behind the `.js` class, so without JavaScript all twelve cards
+         render and the pager is hidden instead — content is never trapped
+         behind a control that cannot work. -->
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p7name">Customs Operations System</h3>
+        <span class="tag client" data-i18n="proj.p7tag">Mesco</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p7co">at GBS — Global Barcode Solution</span></p>
+      <p class="scope" data-i18n="proj.p7scope">Management and organization of customs operations, delivered as three integrated platforms — web, mobile, and desktop.</p>
+      <p class="role" data-i18n-html="proj.p7role"><b>My contribution:</b> both frontend and backend development, including API creation across the three platforms.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">MVC</span><span class="chip">Telerik UI</span><span class="chip">Web API</span><span class="chip">SQL Server</span><span class="chip">Crystal Reports</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p8name">Warehouse Order Tracking System</h3>
+        <span class="tag client" data-i18n="proj.p8tag">Juhayna</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p8co">at GBS — Global Barcode Solution</span></p>
+      <p class="scope" data-i18n="proj.p8scope">Order tracing and tracking across the full warehouse process, integrated directly with Oracle, spanning web, mobile, and desktop systems.</p>
+      <p class="role" data-i18n-html="proj.p8role"><b>My contribution:</b> backend development and the API integration with Oracle.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">MVC</span><span class="chip">Telerik UI</span><span class="chip">Web API</span><span class="chip">SQL Server</span><span class="chip hot">Oracle</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p9name">Work Order Management System</h3>
+        <span class="tag client" data-i18n="proj.p9tag">Schneider</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p9co">at GBS — Global Barcode Solution</span></p>
+      <p class="scope" data-i18n="proj.p9scope">Work-order management covering storage, issuance, and receipt operations, delivered as three systems — web, mobile, and desktop.</p>
+      <p class="role" data-i18n-html="proj.p9role"><b>My contribution:</b> full-stack development across frontend and backend, including API creation.</p>
+      <div class="chips">
+        <span class="chip">ASP.NET Core</span><span class="chip">MVC</span><span class="chip">Telerik UI</span><span class="chip">Web API</span><span class="chip">SQL Server</span><span class="chip">Crystal Reports</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p10name">Ajwal — B2B Travel Booking Portal</h3>
+        <span class="tag" data-i18n="proj.p10tag">Travel B2B</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p10co">Freelance</span></p>
+      <p class="scope" data-i18n="proj.p10scope">A B2B travel booking portal wired into third-party APIs for hotel, flight, and train reservations.</p>
+      <p class="role" data-i18n-html="proj.p10role"><b>My contribution:</b> built the interfaces and integrated the third-party booking APIs into the UI.</p>
+      <div class="chips">
+        <span class="chip">JavaScript</span><span class="chip">jQuery</span><span class="chip">AJAX</span><span class="chip">JSON</span><span class="chip">HTML5</span><span class="chip">CSS3</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p11name">Technohub</h3>
+        <span class="tag" data-i18n="proj.p11tag">Web</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p11co">Freelance</span></p>
+      <p class="scope" data-i18n="proj.p11scope">Client web work: building interfaces and integrating APIs, including a portfolio site presenting the team and its work.</p>
+      <p class="role" data-i18n-html="proj.p11role"><b>My contribution:</b> built the interfaces and wired the API integrations into the UI.</p>
+      <div class="chips">
+        <span class="chip">JavaScript</span><span class="chip">jQuery</span><span class="chip">AJAX</span><span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">Bootstrap</span>
+      </div>
+    </article>
+
+    <article class="proj">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p12name">Front-End Contracting</h3>
+        <span class="tag" data-i18n="proj.p12tag">Front-end</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">🏢</span><span data-i18n="proj.p12co">Freelance</span></p>
+      <p class="scope" data-i18n="proj.p12scope">Independent front-end work for multiple clients — converting PSD designs into responsive, cross-browser pages and consuming REST APIs.</p>
+      <p class="role" data-i18n-html="proj.p12role"><b>My contribution:</b> UI design and implementation, responsive layout, AJAX API consumption, and front-end defect resolution.</p>
+      <div class="chips">
+        <span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">JavaScript</span><span class="chip">jQuery</span><span class="chip">AJAX</span><span class="chip">Responsive design</span>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- Pager. Hidden unless JS is alive — see .js gating in the stylesheet. -->
+  <nav class="pager" id="pager" data-i18n-aria="pager.aria" aria-label="Project pages" hidden>
+    <button class="pager-btn" id="pager-prev" type="button" data-i18n="pager.prev" data-i18n-aria="pager.prevAria" aria-label="Previous page">← Prev</button>
+    <span class="pager-pages" id="pager-pages"></span>
+    <button class="pager-btn" id="pager-next" type="button" data-i18n="pager.next" data-i18n-aria="pager.nextAria" aria-label="Next page">Next →</button>
+  </nav>
+  <p class="pager-status" id="pager-status" role="status" aria-live="polite"></p>
+</section>
+
+<!-- ───────────────────────── EDUCATION ───────────────────────── -->
+<section id="education" class="wrap reveal" aria-labelledby="h-edu">
+  <div class="sec-head"><span class="num">05.</span><h2 id="h-edu" data-i18n="edu.title">Education &amp; Certifications</h2><span class="rule"></span></div>
+
+  <div class="edu stagger">
+    <div class="card">
+      <h3 data-i18n="edu.eduTitle">Education</h3>
+      <p class="deg" data-i18n="edu.degree">BSc Computer Science</p>
+      <p data-i18n="edu.school">Thebes Academy, Egypt — graduated 2019</p>
+      <p style="margin-top:.7rem;color:var(--text-mute);font-size:.85rem" data-i18n-html="edu.gradProject">
+        Graduation project: Pharmacy Management System — rated <strong style="color:var(--accent)">Excellent</strong>.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="edu.certTitle">Certifications &amp; Training</h3>
+      <ul>
+        <li data-i18n="edu.cert1">Web Development Diploma (C#, ASP.NET) — Russian Cultural Center</li>
+        <li data-i18n="edu.cert2">Frontend Design Diploma — National Telecommunication Institute (NTI)</li>
+        <li data-i18n="edu.cert3">International English Language Certificate — Ain Shams University (M.E.S.C / Arab University Academy), 2018</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="edu.langTitle">Languages &amp; Strengths</h3>
+      <ul>
+        <li data-i18n-html="edu.lang1"><strong style="color:var(--text)">Arabic</strong> — native</li>
+        <li data-i18n-html="edu.lang2"><strong style="color:var(--text)">English</strong> — professional working proficiency</li>
+        <li data-i18n="edu.soft1">Problem-solving and critical thinking</li>
+        <li data-i18n="edu.soft2">Strong written and verbal communication</li>
+        <li data-i18n="edu.soft3">Collaborative cross-functional contributor</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────────────── CONTACT ───────────────────────── -->
+<section id="contact" class="wrap contact reveal" aria-labelledby="h-contact">
+  <span class="num" data-i18n="contact.eyebrow">06. What's next</span>
+  <h2 id="h-contact" data-i18n="contact.title">Let's build something that lasts</h2>
+  <p data-i18n="contact.body">
+    I'm open to Senior Backend .NET and .NET Architect roles — on-site, hybrid, or remote.
+    If you're building something that has to scale and stay maintainable five years from now,
+    I'd like to hear about it.
+  </p>
+
+  <div class="cta">
+    <a class="btn primary" href="mailto:mohamedmatroud22@gmail.com" target="_blank" rel="noopener noreferrer" data-i18n="contact.email">✉ Email me</a>
+    <!-- Same shared key as the hero button — one Arabic string serves both. -->
+    <a class="btn" href="Mohamed_Matroud_CV.pdf" download target="_blank" rel="noopener noreferrer" data-i18n="cta.downloadCv">↓ Download CV</a>
+    <a class="btn" href="https://wa.me/201550250899?text=Hi%20Mohamed%2C%20I%20found%20your%20portfolio%20and%20I%27d%20like%20to%20talk%20about%20a%20.NET%20role." target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>
+    <!-- Label says "email" deliberately: a postal address is now on screen too,
+         and "Copy address" would read as the wrong one. -->
+    <button class="btn" id="copy" type="button" data-i18n="contact.copy" data-email="mohamedmatroud22@gmail.com">⧉ Copy email</button>
+    <a class="btn" href="https://www.linkedin.com/in/mohamed-matroud-75ba5a16b" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+    <a class="btn" href="https://github.com/mohamedmatroud" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+  </div>
+
+  <p class="copied" id="copied" role="status" aria-live="polite"></p>
+
+  <ul class="contact-details">
+    <li>
+      <span class="ci" aria-hidden="true">📱</span>
+      <!-- .ltr is load-bearing: inside RTL text an unisolated "+20 155 025 0899"
+           reorders on screen, and this is a number a recruiter has to dial. -->
+      <a class="ltr" href="https://wa.me/201550250899?text=Hi%20Mohamed%2C%20I%20found%20your%20portfolio%20and%20I%27d%20like%20to%20talk%20about%20a%20.NET%20role."
+         target="_blank" rel="noopener noreferrer"
+         data-i18n-aria="contact.phoneAria"
+         aria-label="Message +20 155 025 0899 on WhatsApp">+20 155 025 0899</a>
+      <span class="hint" data-i18n="contact.opensWhatsApp">opens WhatsApp</span>
+    </li>
+    <li>
+      <span class="ci" aria-hidden="true">📍</span>
+      <span class="addr" data-i18n="contact.address">Degla Palms, New October, Giza, Egypt</span>
+    </li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <span>© <span id="yr">2026</span> <span data-i18n="footer.name">Mohamed Matroud Abd El-Hady</span></span>
+  <span data-i18n="footer.built">Built by hand — no frameworks, no build step, one file.</span>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ── Arabic dictionary ────────────────────────────────────────────────
+     English is not duplicated here — it lives in the markup and is snapshotted
+     on load, so the two can never drift apart.
+
+     Translation policy: product and pattern names stay Latin (C#, EF Core,
+     CQRS, SOLID, Repository) because that is the norm in Arabic technical
+     writing and keeps them searchable. Generic descriptions are translated.
+     Employer and client names are transliterated with the Latin original in
+     parentheses, so a recruiter can still search and verify them.
+
+     NOTE: drafted by Claude, and it needs a native read-through before this
+     goes live. Any wording change is a one-line edit in this object. */
+  var AR = {
+    "nav.skip":"تخطَّ إلى المحتوى",
+    "nav.about":"نبذة",
+    "nav.stack":"التقنيات",
+    "nav.experience":"الخبرة",
+    "nav.projects":"المشاريع",
+    "nav.education":"التعليم",
+    "nav.contact":"تواصل",
+    "nav.menuAria":"فتح وإغلاق القائمة",
+
+    "hero.name":"محمد مطرود",
+    "hero.role":"مطور <em>.NET</em> أول &nbsp;·&nbsp; مهندس أنظمة خلفية للمؤسسات",
+    "hero.lede":"أبني الأنظمة الخلفية التي تُدير أعمال المؤسسات فعليًا — <strong>منصات تخطيط الموارد والموارد البشرية والمالية وإدارة الأصول</strong> حيث يعني التوقف تعطُّل العمل، لا تعطُّل صفحة أخبار. أكثر من خمس سنوات في ASP.NET Core والمعمارية النظيفة وتحسين أداء SQL Server، لعملاء منهم <strong>البنك الوطني المركزي (Central National Bank)</strong> و<strong>جوتن (Jotun)</strong>.",
+    "hero.ctaWork":"استعرض الأعمال ←",
+    "cta.downloadCv":"↓ تحميل السيرة الذاتية",
+    "hero.qfYears":"سنوات مع .NET",
+    "hero.qfSystems":"مشاريع مُسلَّمة",
+    "hero.qfDomains":"مجالات مؤسسية",
+    "hero.qfStack":"التقنية الحالية",
+
+    "about.title":"نبذة عني",
+    "about.p1":"على مدى أكثر من خمس سنوات كمطور .NET انتقلتُ من تسليم المزايا إلى امتلاك القرار المعماري. أقود اليوم <strong>معمارية الأنظمة الخلفية وتطوير الواجهات البرمجية وتحسين أداء قواعد البيانات</strong> لمنصة تخطيط موارد مؤسسية متعددة الوحدات تغطي المالية والمخزون والمشتريات والموارد البشرية — بتصميم كل وحدة وفق المعمارية النظيفة ومبادئ SOLID كي يظل النظام قابلًا للتوسّع بدل أن يتجمّد بعد إصداره الأول.",
+    "about.p2":"يقع عملي عند تقاطع ثلاثة أمور: <strong>معمارية تصمد في عامها الثاني</strong>، و<strong>واجهات برمجية تبقى سريعة تحت حِمل حقيقي</strong>، و<strong>مخططات SQL Server لا تنهار حين يصل حجم البيانات الفعلي</strong>. يعني ذلك تصميم الأحادية المعيارية والمعمارية النظيفة وCQRS ولبنات DDD مطبَّقة على أنظمة إنتاج حقيقية، لا على مشاريع جانبية.",
+    "about.p3":"قضيتُ كذلك وقتًا طويلًا في النصف غير البرّاق من عمل المؤسسات: تحديث واجهات برمجية قديمة لا يمكن إعادة كتابتها، ودمج أنظمة Oracle داخل تطبيقات .NET، وإبقاء أنظمة نقاط البيع والمحاسبة والمخزون متزامنة لحظيًا، وربط منصة فوترة إلكترونية بنظام امتثال ضريبي وطني في السعودية. الأنظمة التي يقف خلفها مُنظِّم تُعلِّمك الاهتمام بالصحّة بطريقة لا يُعلِّمها العمل من الصفر.",
+    "about.p4":"أنا منفتح حاليًا على أدوار <strong>مطور .NET خلفي أول</strong> و<strong>مهندس معماري .NET</strong> — في المقر أو هجينة أو عن بُعد.",
+    "about.glance":"لمحة سريعة",
+    "about.kRole":"الدور الحالي",      "about.vRole":"مطور .NET أول",
+    "about.kExp":"الخبرة",             "about.vExp":"أكثر من 5 سنوات",
+    "about.kStack":"التقنية الأساسية",
+    "about.kDb":"قاعدة البيانات",
+    "about.kArch":"المعمارية",
+    "about.kFront":"الواجهة الأمامية",
+    "about.kDegree":"المؤهل",          "about.vDegree":"بكالوريوس علوم حاسب",
+    "about.kArabic":"العربية",         "about.vArabic":"اللغة الأم",
+    "about.kEnglish":"الإنجليزية",     "about.vEnglish":"إجادة احترافية",
+    "about.kAvail":"الإتاحة",          "about.vAvail":"منفتح على العروض",
+
+    "stack.title":"التقنيات",
+    "stack.langs":"اللغات وبيئات التشغيل",
+    "stack.backend":"أطر العمل الخلفية",
+    "stack.arch":"المعمارية وأنماط التصميم",
+    "stack.api":"الواجهات البرمجية والأمان",
+    "stack.db":"قواعد البيانات",
+    "stack.frontend":"الواجهات الأمامية",
+    "stack.testing":"الاختبار والجودة",
+    "stack.devops":"DevOps والأدوات",
+    "stack.logging":"السجلّات والتقارير والتكامل",
+
+    "chip.ddd":"مفاهيم DDD",
+    "chip.di":"حقن التبعيات",
+    "chip.restDesign":"تصميم واجهات REST",
+    "chip.versioning":"إصدارات الواجهات البرمجية",
+    "chip.sprocs":"الإجراءات المخزَّنة",
+    "chip.indexing":"استراتيجية الفهرسة",
+    "chip.queryOpt":"تحسين الاستعلامات",
+    "chip.schema":"تصميم المخطَّط",
+    "chip.migrations":"ترحيلات EF Core",
+    "chip.responsive":"تصميم متجاوب",
+    "chip.unitTest":"اختبارات الوحدة",
+    "chip.intTest":"اختبارات التكامل",
+    "chip.reviews":"مراجعات الكود",
+    "chip.iis":"النشر على IIS",
+    "chip.envcfg":"إدارة إعدادات البيئة",
+    "chip.audit":"سجلّات تدقيق مخصّصة",
+    "chip.oracle":"التكامل مع Oracle",
+    "chip.sync":"مزامنة البيانات لحظيًا",
+
+    "exp.title":"الخبرة العملية",
+    "exp.j1title":"مطور .NET أول &nbsp;<span class=\"co\">· دايناميك بيزنس سوليوشن (Dynamic Business Solution)</span>",
+    "exp.j1when":"مارس 2025 — حتى الآن",
+    "exp.j1b1":"أقود معمارية الأنظمة الخلفية وتطوير واجهات REST وتحسين أداء SQL Server لمنصة تخطيط موارد مؤسسية متعددة الوحدات تغطي المالية والمخزون والمشتريات والموارد البشرية.",
+    "exp.j1b2":"أصمّم وأنفّذ وحدات ERP جديدة وفق مبادئ المعمارية المعيارية، مع تطبيق SOLID وأنماط تصميم مُجرَّبة لضمان قابلية التوسّع والصيانة.",
+    "exp.j1b3":"أُحدِّث الواجهات البرمجية القديمة وأُحصّنها لتحسين الأداء والأمان والموثوقية عبر إعادة هيكلة موجَّهة وتحسين الاستعلامات.",
+    "exp.j1b4":"أبني واجهات REST باستخدام ASP.NET Core وWeb API مع حقن التبعيات وفصل واضح للمسؤوليات.",
+    "exp.j1b5":"أصمّم قواعد بيانات SQL Server وأحسّنها — إجراءات مخزَّنة وفهارس وضبط للمخطَّط لعمليات عالية الإنتاجية.",
+    "exp.j1b6":"أُسهم في التخطيط المعماري وتحليل المتطلبات والقرارات التقنية لوحدات قابلة لإعادة الاستخدام والتوسعة.",
+    "exp.j2title":"مطور متكامل &nbsp;<span class=\"co\">· ألتيميت سوليوشنز (Ultimate Solutions)</span>",
+    "exp.j2when":"نوفمبر 2023 — مارس 2025",
+    "exp.j2b1":"سلَّمتُ حلولًا متكاملة تشمل الواجهات الأمامية والخلفية لعملاء في المالية وإدارة المطاعم، من بينها أنظمة مُشغَّلة في السوق السعودي.",
+    "exp.j2b2":"صمّمتُ وطوّرتُ خدمات REST باستخدام ASP.NET Core وWeb API، مع تطبيق مبادئ البرمجة الكائنية وأنماط التصميم للحفاظ على كود نظيف وقابل للاختبار.",
+    "exp.j2b3":"نفّذتُ تصميم وإدارة قواعد البيانات العلائقية في SQL Server، بما في ذلك الإجراءات المخزَّنة وتحسين الاستعلامات.",
+    "exp.j2b4":"دمجتُ Angular وjQuery وAJAX وJSON مع الخدمات الخلفية لتقديم تجربة استخدام سلسة.",
+    "exp.j2b5":"شاركتُ في تصميم واجهات برمجية عابرة للأنظمة تُتيح تكاملًا موثوقًا بين منصات متعددة.",
+    "exp.j3title":"مطور .NET &nbsp;<span class=\"co\">· جي بي إس (GBS — Global Barcode Solution)</span>",
+    "exp.j3when":"فبراير 2021 — أكتوبر 2023",
+    "exp.j3b1":"سلَّمتُ أنظمة مؤسسية متكاملة لإدارة الأصول والتحكم في المخازن والعمليات عبر الويب والهاتف وسطح المكتب، لعملاء منهم البنك الوطني المركزي وجوتن.",
+    "exp.j3b2":"طوّرتُ وصُنتُ حلولًا متكاملة باستخدام ASP.NET وASP.NET Core وMVC وTelerik UI وSQL Server وWeb API وAJAX وCrystal Reports.",
+    "exp.j3b3":"صمّمتُ واجهات REST تدعم التكامل عبر المنصات بين عملاء الويب وسطح المكتب والهاتف.",
+    "exp.j3b4":"نفّذتُ تصميم وتحسين قواعد البيانات لعمليات نشر SQL Server على مستوى المؤسسات.",
+    "exp.j3b5":"دمجتُ أنظمة خارجية منها Oracle داخل تطبيقات .NET مخصّصة.",
+    "exp.j4title":"مطور واجهات أمامية مستقل &nbsp;<span class=\"co\">· عمل حر</span>",
+    "exp.j4when":"مايو 2018 — مايو 2020",
+    "exp.j4b1":"بنيتُ واجهات المستخدم ودمجتُ واجهات برمجية خارجية داخلها عبر عدة تطبيقات ويب للعملاء.",
+    "exp.j4b2":"سلَّمتُ «أجوال»، بوابة حجز سفر بين الشركات تتصل بواجهات برمجية خارجية لحجز الفنادق والطيران والقطارات.",
+    "exp.j4b3":"حوّلتُ تصاميم PSD إلى صفحات ويب متجاوبة متوافقة مع المتصفحات، وحسّنتُ المظهر البصري لمواقع عملاء قائمة.",
+    "exp.j4b4":"استهلكتُ واجهات REST عبر AJAX وعالجتُ أعطال الواجهات الأمامية في مشاريع العملاء.",
+
+    "proj.title":"مشاريع مختارة",
+    "proj.p13name":"نوفا للزوّار — منصة الوصول للمجمّعات السكنية",
+    "proj.p13tag":"متعدّد المستأجرين",
+    "proj.p13co":"لدى دايناميك بيزنس سوليوشن (Dynamic Business Solution)",
+    "proj.p13scope":"منصة متكاملة للمجمّعات السكنية المغلقة تغطي تسجيل المُلّاك ومصادقة السكان وسجلات الوحدات والأشخاص والزيارات ولوحات التحكم الإدارية. تعمل بنشر منقسم — خادم لكل قرية يحتفظ بالبيانات المحلية، مع سجل مركزي مشترك يزامن هويات المُلّاك والتقارير العابرة للقرى عبر HTTP، مع عزل كل قرية في قاعدة بيانات SQL Server خاصة بها. وتضيف تحديد النطاق الجغرافي بالمضلّعات، وتفعيلًا مرتبطًا ببصمة الجهاز، وواجهة ثنائية اللغة.",
+    "proj.p13role":"<b>مساهمتي:</b> مطوّر للواجهات الخلفية والأمامية — صمّمتُ حقن التبعيات للنشر المنقسم، وبنيتُ واجهة <code>/CentralOwnerSync</code>، وأضفتُ صفحة تصفية الأشخاص، ونفّذتُ إعادة بناء الواجهة ثنائية اللغة بدعم كامل للاتجاه من اليمين إلى اليسار.",
+    "proj.p1co":"لدى دايناميك بيزنس سوليوشن (Dynamic Business Solution)",
+    "proj.p2co":"لدى دايناميك بيزنس سوليوشن (Dynamic Business Solution)",
+    "proj.p3co":"لدى ألتيميت سوليوشنز (Ultimate Solutions)",
+    "proj.p4co":"لدى ألتيميت سوليوشنز (Ultimate Solutions)",
+    "proj.p5co":"لدى جي بي إس (GBS — Global Barcode Solution)",
+    "proj.p6co":"لدى جي بي إس (GBS — Global Barcode Solution)",
+    "proj.p1name":"منصة تخطيط موارد المؤسسات",
+    "proj.p1tag":"من الصفر",
+    "proj.p1scope":"حل ERP متكامل يغطي وظائف المالية والمخزون والمشتريات والموارد البشرية — مبني من الأساس لا مُوسَّعًا من قالب جاهز.",
+    "proj.p1role":"<b>مساهمتي:</b> تعريف نماذج البيانات، وتصميم المنطق الخلفي، وبناء الواجهات البرمجية، ودعم تكامل الواجهة الأمامية.",
+    "proj.p2name":"نظام نوفا للموارد البشرية",
+    "proj.p2tag":"منصة موارد بشرية",
+    "proj.p2scope":"منصة موارد بشرية متكاملة تُدير الحضور والإجازات والرواتب والتعيين والنقل الداخلي.",
+    "proj.p2role":"<b>مساهمتي:</b> نمذجة كيانات المجال الأساسية، وكتابة منطق الأعمال، وتطوير المزايا، ومعالجة أعطال إنتاج حرجة.",
+    "proj.p3name":"منصة تكامل الفوترة الإلكترونية",
+    "proj.p3tag":"السعودية",
+    "proj.p3scope":"إنشاء فواتير العملاء وإدارتها، مع التكامل مع نظام تتبُّع وطني لحظي للامتثال الضريبي — تكامل خاضع للتنظيم تكون فيه الحمولة المُشوَّهة إخفاقًا في الامتثال لا مجرد بلاغ خطأ.",
+    "proj.p3role":"<b>مساهمتي:</b> امتلاك تطوير الواجهة الأمامية وتصميم الواجهات البرمجية، وضمان تدفّق بيانات موثوق بين المنصة والأنظمة التنظيمية الخارجية.",
+    "proj.p4name":"تكامل نقاط بيع المطاعم",
+    "proj.p4tag":"مزامنة لحظية",
+    "proj.p4scope":"تكامل نظام نقاط بيع لمطعم مع منصات المحاسبة والمخزون المركزية.",
+    "proj.p4role":"<b>مساهمتي:</b> تصميم وتنفيذ الواجهات البرمجية التي تُتيح مزامنة لحظية لبيانات المبيعات والمحاسبة والمخزون — بما رفع وضوح العمليات عبر الأنظمة.",
+    "proj.p5name":"نظام تدقيق الأصول",
+    "proj.p5tag":"البنك الوطني المركزي",
+    "proj.p5scope":"حل مؤسسي لإدارة الأصول يتتبّع أصول المؤسسة عبر ثلاث منصات مترابطة — الويب والهاتف وسطح المكتب.",
+    "proj.p5role":"<b>مساهمتي:</b> تطوير متكامل، وتصميم الواجهات البرمجية، والتكامل عبر الأنظمة الثلاثة جميعها.",
+    "proj.p6name":"نظام التحكم في المخازن",
+    "proj.p6tag":"جوتن",
+    "proj.p6scope":"تصميم رموز QR والباركود مقترنًا بإدارة عمليات المخازن، عبر تطبيقات الويب وسطح المكتب.",
+    "proj.p6role":"<b>مساهمتي:</b> امتلاك التطوير المتكامل لتطبيقَي الويب وسطح المكتب.",
+    "proj.p7name":"نظام العمليات الجمركية",
+    "proj.p7tag":"ميسكو",
+    "proj.p7co":"لدى جي بي إس (GBS — Global Barcode Solution)",
+    "proj.p7scope":"إدارة وتنظيم العمليات الجمركية، مُسلَّمًا كثلاث منصات متكاملة — الويب والهاتف وسطح المكتب.",
+    "proj.p7role":"<b>مساهمتي:</b> تطوير الواجهات الأمامية والخلفية معًا، بما في ذلك بناء الواجهات البرمجية عبر المنصات الثلاث.",
+    "proj.p8name":"نظام تتبُّع أوامر المخازن",
+    "proj.p8tag":"جهينة",
+    "proj.p8co":"لدى جي بي إس (GBS — Global Barcode Solution)",
+    "proj.p8scope":"تتبُّع الأوامر عبر دورة المخزن كاملة، بتكامل مباشر مع Oracle، ويمتد إلى أنظمة الويب والهاتف وسطح المكتب.",
+    "proj.p8role":"<b>مساهمتي:</b> تطوير الجانب الخلفي وتكامل الواجهات البرمجية مع Oracle.",
+    "proj.p9name":"نظام إدارة أوامر العمل",
+    "proj.p9tag":"شنايدر",
+    "proj.p9co":"لدى جي بي إس (GBS — Global Barcode Solution)",
+    "proj.p9scope":"إدارة أوامر العمل شاملةً عمليات التخزين والصرف والاستلام، مُسلَّمًا كثلاثة أنظمة — الويب والهاتف وسطح المكتب.",
+    "proj.p9role":"<b>مساهمتي:</b> تطوير متكامل عبر الواجهات الأمامية والخلفية، بما في ذلك بناء الواجهات البرمجية.",
+    "proj.p10name":"أجوال — بوابة حجز السفر بين الشركات",
+    "proj.p10tag":"سفر B2B",
+    "proj.p10co":"عمل حر",
+    "proj.p10scope":"بوابة حجز سفر بين الشركات مرتبطة بواجهات برمجية خارجية لحجز الفنادق والطيران والقطارات.",
+    "proj.p10role":"<b>مساهمتي:</b> بناء الواجهات ودمج واجهات الحجز الخارجية داخلها.",
+    "proj.p11name":"تكنوهَب",
+    "proj.p11tag":"ويب",
+    "proj.p11co":"عمل حر",
+    "proj.p11scope":"أعمال ويب للعملاء: بناء الواجهات ودمج الواجهات البرمجية، ومنها موقع أعمال يعرض الفريق ومشاريعه.",
+    "proj.p11role":"<b>مساهمتي:</b> بناء الواجهات وربط تكاملات الواجهات البرمجية بها.",
+    "proj.p12name":"أعمال الواجهات الأمامية المستقلة",
+    "proj.p12tag":"واجهات أمامية",
+    "proj.p12co":"عمل حر",
+    "proj.p12scope":"عمل حر في الواجهات الأمامية لعملاء متعددين — تحويل تصاميم PSD إلى صفحات متجاوبة متوافقة مع المتصفحات، واستهلاك واجهات REST.",
+    "proj.p12role":"<b>مساهمتي:</b> تصميم الواجهات وتنفيذها، والتخطيط المتجاوب، واستهلاك الواجهات البرمجية عبر AJAX، ومعالجة أعطال الواجهة الأمامية.",
+    "pager.aria":"صفحات المشاريع",
+    "pager.prev":"→ السابق",
+    "pager.prevAria":"الصفحة السابقة",
+    "pager.next":"التالي ←",
+    "pager.nextAria":"الصفحة التالية",
+
+    "edu.title":"التعليم والشهادات",
+    "edu.eduTitle":"التعليم",
+    "edu.degree":"بكالوريوس علوم الحاسب",
+    "edu.school":"أكاديمية طيبة، مصر — تخرَّج 2019",
+    "edu.gradProject":"مشروع التخرّج: نظام إدارة صيدلية — بتقدير <strong style=\"color:var(--accent)\">امتياز</strong>.",
+    "edu.certTitle":"الشهادات والتدريب",
+    "edu.cert1":"دبلومة تطوير الويب (C#، ASP.NET) — المركز الثقافي الروسي",
+    "edu.cert2":"دبلومة تصميم الواجهات الأمامية — المعهد القومي للاتصالات (NTI)",
+    "edu.cert3":"شهادة اللغة الإنجليزية الدولية — جامعة عين شمس (M.E.S.C / أكاديمية الجامعة العربية)، 2018",
+    "edu.langTitle":"اللغات ونقاط القوة",
+    "edu.lang1":"<strong style=\"color:var(--text)\">العربية</strong> — اللغة الأم",
+    "edu.lang2":"<strong style=\"color:var(--text)\">الإنجليزية</strong> — إجادة احترافية للعمل",
+    "edu.soft1":"حل المشكلات والتفكير النقدي",
+    "edu.soft2":"تواصل كتابي وشفهي قوي",
+    "edu.soft3":"مساهم تعاوني عبر الفرق المختلفة",
+
+    "contact.eyebrow":"06. الخطوة التالية",
+    "contact.title":"لنبنِ شيئًا يدوم",
+    "contact.body":"أنا منفتح على أدوار مطور .NET خلفي أول ومهندس معماري .NET — في المقر أو هجينة أو عن بُعد. إن كنت تبني شيئًا لا بد أن يتوسّع ويبقى قابلًا للصيانة بعد خمس سنوات، يسعدني أن أسمع عنه.",
+    "contact.email":"✉ راسلني بالبريد",
+    "contact.copy":"⧉ نسخ البريد",
+    "contact.opensWhatsApp":"يفتح واتساب",
+    "contact.phoneAria":"مراسلة ‪+20 155 025 0899‬ على واتساب",
+    "contact.address":"دجلة بالمز، أكتوبر الجديدة، الجيزة، مصر",
+
+    "footer.name":"محمد مطرود عبد الهادي",
+    "footer.built":"مصنوع يدويًا — دون أطر عمل أو خطوة بناء، في ملف واحد."
+  };
+
+  /* Strings the script generates rather than reading from the DOM, so these
+     do need both languages. ⁦…⁩ are Unicode isolate marks — they keep
+     a Latin email from reordering inside the Arabic sentence. */
+  var UI = {
+    en: {
+      menu:"≡ menu", close:"✕ close",
+      toLight:"Switch to light theme", toDark:"Switch to dark theme",
+      langGlyph:"ع", langAria:"التبديل إلى العربية", langTag:"ar",
+      copied:"✓ ⁦{v}⁩ copied to clipboard",
+      pageAria:"Go to page {n}", pageOf:"Page {a} of {b}",
+      title:"Mohamed Matroud — Senior .NET Developer",
+      desc:"Senior .NET Developer with 5+ years building enterprise ERP, HR, and financial integration systems using ASP.NET Core, C#, EF Core, and SQL Server."
+    },
+    ar: {
+      menu:"≡ القائمة", close:"✕ إغلاق",
+      toLight:"التبديل إلى الوضع الفاتح", toDark:"التبديل إلى الوضع الداكن",
+      langGlyph:"EN", langAria:"Switch to English", langTag:"en",
+      copied:"✓ تم نسخ ⁦{v}⁩",
+      pageAria:"الانتقال إلى الصفحة {n}", pageOf:"صفحة {a} من {b}",
+      title:"محمد مطرود — مطور .NET أول",
+      desc:"مطور .NET أول بخبرة تتجاوز خمس سنوات في بناء أنظمة تخطيط الموارد والموارد البشرية والتكامل المالي للمؤسسات باستخدام ASP.NET Core وC# وEF Core وSQL Server."
+    }
+  };
+
+  function lang() {
+    return document.documentElement.getAttribute("lang") === "ar" ? "ar" : "en";
+  }
+  function ui() { return UI[lang()]; }
+
+  /* Footer year */
+  var yr = document.getElementById("yr");
+  if (yr) { yr.textContent = String(new Date().getFullYear()); }
+
+  /* ── Theme ────────────────────────────────────────────────────────────
+     The head script has already applied any saved choice. This part only
+     handles the toggle and keeps the button label truthful.
+
+     Dark is the unconditional default. The OS setting is deliberately NOT
+     consulted — no matchMedia here, and no prefers-color-scheme rule in the
+     stylesheet — so no stored choice means dark for everyone. */
+  var root   = document.documentElement;
+  var toggle = document.getElementById("theme-toggle");
+  var THEME_COLOR = { light: "#f6f8fa", dark: "#0b0f14" };
+
+  function currentTheme() {
+    return root.getAttribute("data-theme") === "light" ? "light" : "dark";
+  }
+
+  /* Label the button with the ACTION, not the current state — "Switch to
+     light theme" is unambiguous where a bare sun icon is not. */
+  function paintToggle() {
+    if (!toggle) { return; }
+    var now   = currentTheme();
+    var label = now === "dark" ? ui().toLight : ui().toDark;
+    toggle.textContent = now === "dark" ? "☀" : "☾";
+    toggle.setAttribute("aria-label", label);
+    toggle.setAttribute("title", label);
+  }
+
+  /* Keep the browser-chrome colour in step with the active theme. */
+  function paintThemeColor() {
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) { meta.setAttribute("content", THEME_COLOR[currentTheme()]); }
+  }
+
+  paintToggle();
+  paintThemeColor();
+
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      var next = currentTheme() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch (e) { /* private mode */ }
+      paintToggle();
+      paintThemeColor();
+    });
+  }
+
+  /* ── Language ─────────────────────────────────────────────────────────
+     English is not stored in a dictionary — it is snapshotted from the markup
+     on load. Switching back is therefore a restore, not a second copy of the
+     text that could silently drift out of sync with the page. */
+  var langBtn = document.getElementById("lang-toggle");
+  var i18nEls = Array.prototype.slice.call(
+    document.querySelectorAll("[data-i18n],[data-i18n-html],[data-i18n-aria],[data-i18n-title]")
+  );
+  var EN = i18nEls.map(function (el) {
+    return {
+      el:    el,
+      text:  el.getAttribute("data-i18n")       ? el.textContent                : null,
+      html:  el.getAttribute("data-i18n-html")  ? el.innerHTML                  : null,
+      aria:  el.getAttribute("data-i18n-aria")  ? el.getAttribute("aria-label") : null,
+      title: el.getAttribute("data-i18n-title") ? el.getAttribute("title")      : null
+    };
+  });
+
+  function applyLang(next) {
+    var ar = next === "ar";
+    root.setAttribute("lang", ar ? "ar" : "en");
+    root.setAttribute("dir",  ar ? "rtl" : "ltr");
+
+    EN.forEach(function (snap) {
+      var el = snap.el, k;
+      /* On a missing key, fall back to the English snapshot. A gap in the
+         dictionary then degrades to readable English rather than a blank node. */
+      if ((k = el.getAttribute("data-i18n"))) {
+        el.textContent = ar && AR[k] != null ? AR[k] : snap.text;
+      }
+      if ((k = el.getAttribute("data-i18n-html"))) {
+        el.innerHTML = ar && AR[k] != null ? AR[k] : snap.html;
+      }
+      if ((k = el.getAttribute("data-i18n-aria"))) {
+        el.setAttribute("aria-label", ar && AR[k] != null ? AR[k] : snap.aria);
+      }
+      if ((k = el.getAttribute("data-i18n-title"))) {
+        el.setAttribute("title", ar && AR[k] != null ? AR[k] : snap.title);
+      }
+    });
+
+    var u = ui();
+    document.title = u.title;
+    var desc = document.querySelector('meta[name="description"]');
+    if (desc) { desc.setAttribute("content", u.desc); }
+
+    if (langBtn) {
+      langBtn.textContent = u.langGlyph;
+      langBtn.setAttribute("aria-label", u.langAria);
+      /* Tag the glyph's own language so a screen reader pronounces "ع" rather
+         than spelling it out, and reads "EN" as English. */
+      langBtn.setAttribute("lang", u.langTag);
+    }
+    if (burger && links) {
+      burger.textContent = links.classList.contains("open") ? u.close : u.menu;
+    }
+    /* The pager's numbered buttons are created after the English snapshot is
+       taken, so they are not in i18nEls — the pager relabels them itself. */
+    if (window.__repaintPager) { window.__repaintPager(); }
+    paintToggle();   /* the theme button's label is language-dependent too */
+  }
+
+  /* The head script already set lang/dir from storage; this fills in the text.
+     Still synchronous and before first paint, so there is no flash of English. */
+  applyLang(lang());
+
+  if (langBtn) {
+    langBtn.addEventListener("click", function () {
+      var next = lang() === "ar" ? "en" : "ar";
+      applyLang(next);
+      try { localStorage.setItem("lang", next); } catch (e) { /* private mode */ }
+    });
+  }
+
+  /* Mobile nav */
+  var burger = document.getElementById("burger");
+  var links  = document.getElementById("navlinks");
+
+  if (burger && links) {
+    burger.addEventListener("click", function () {
+      var open = links.classList.toggle("open");
+      burger.setAttribute("aria-expanded", String(open));
+      burger.textContent = open ? ui().close : ui().menu;
+    });
+
+    /* Close the menu after choosing a destination */
+    links.addEventListener("click", function (e) {
+      if (e.target.closest("a") && links.classList.contains("open")) {
+        links.classList.remove("open");
+        burger.setAttribute("aria-expanded", "false");
+        burger.textContent = ui().menu;
+      }
+    });
+  }
+
+  /* Scroll-spy: highlight the section currently in view */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main section[id]"));
+  var navMap = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.nav-links a[href^="#"]'), function (a) {
+    navMap[a.getAttribute("href").slice(1)] = a;
+  });
+
+  if ("IntersectionObserver" in window && sections.length) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var link = navMap[en.target.id];
+        if (!link) { return; }
+        if (en.isIntersecting) {
+          Object.keys(navMap).forEach(function (k) { navMap[k].classList.remove("active"); });
+          link.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+
+    sections.forEach(function (s) { spy.observe(s); });
+  }
+
+  /* Reveal on scroll — skipped entirely when reduced motion is requested */
+  var revealables = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (reduce || !("IntersectionObserver" in window)) {
+    revealables.forEach(function (el) { el.classList.add("in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries, obs) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add("in");
+          obs.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
+
+    revealables.forEach(function (el) { io.observe(el); });
+
+    /* Safety net.
+       IntersectionObserver depends on the page actually compositing frames.
+       In a few real situations it never fires — a background/occluded tab that
+       is restored, some embedded webviews, a prerendered page. If that happens
+       the content would stay at opacity:0 forever, which is a blank portfolio.
+
+       So: if an element is genuinely inside the viewport but still wasn't
+       revealed, treat the observer as dead and show everything. This only
+       triggers on real failure — on load nothing is in view yet (the hero
+       fills the screen), so a normal visitor still gets the animation. */
+    var netFired = false;
+    function safetyNet() {
+      if (netFired) { return; }
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var stranded = revealables.some(function (el) {
+        if (el.classList.contains("in")) { return false; }
+        var b = el.getBoundingClientRect();
+        return b.top < vh && b.bottom > 0;
+      });
+      if (stranded) {
+        netFired = true;
+        revealables.forEach(function (el) { el.classList.add("in"); });
+      }
+    }
+
+    window.setTimeout(safetyNet, 1500);
+    window.addEventListener("scroll", function () {
+      window.setTimeout(safetyNet, 400);
+    }, { passive: true });
+  }
+
+  /* ── Hero 3D graphic: cursor tilt ─────────────────────────────────────
+     Enhancement only. The stack renders and rotates from CSS alone; this just
+     leans it toward the pointer. Not bound at all under reduced motion. */
+  (function () {
+    var tilt = document.getElementById("iso-tilt");
+    var hero = document.querySelector(".hero");
+    if (!tilt || !hero || reduce) { return; }
+
+    hero.addEventListener("pointermove", function (e) {
+      var r = hero.getBoundingClientRect();
+      if (!r.width || !r.height) { return; }
+      /* Clamped to ±0.5. In normal use pointermove only fires while the cursor
+         is inside .hero, so the ratio is already in range — but a synthetic or
+         retargeted event can land outside it and swing the stack wildly. */
+      var clamp = function (v) { return v < -0.5 ? -0.5 : v > 0.5 ? 0.5 : v; };
+      var x = clamp((e.clientX - r.left) / r.width - 0.5);
+      var y = clamp((e.clientY - r.top) / r.height - 0.5);
+      tilt.style.setProperty("--rx", (x * 18).toFixed(2) + "deg");
+      tilt.style.setProperty("--ry", (-y * 13).toFixed(2) + "deg");
+    }, { passive: true });
+
+    hero.addEventListener("pointerleave", function () {
+      tilt.style.setProperty("--rx", "0deg");
+      tilt.style.setProperty("--ry", "0deg");
+    }, { passive: true });
+  })();
+
+  /* Hero entrance backstop. The longest delay (.50s) plus duration (.7s) is
+     1.2s; well past that, force the finished state. Harmless if the animation
+     already played — and it prevents a blank hero if it never did. */
+  window.setTimeout(function () {
+    var hero = document.querySelector(".hero-anim");
+    if (hero) { hero.classList.add("anim-done"); }
+  }, 1600);
+
+  /* ── Project pagination ───────────────────────────────────────────────
+     Six per page. Everything here runs only because JS is alive; the pager
+     starts `hidden` in the markup and all twelve cards start visible, so a
+     no-JS visitor simply gets the full grid and no control. */
+  (function () {
+    var PER_PAGE = 6;
+    var grid   = document.querySelector(".projects");
+    var pager  = document.getElementById("pager");
+    var prev   = document.getElementById("pager-prev");
+    var next   = document.getElementById("pager-next");
+    var pages  = document.getElementById("pager-pages");
+    var status = document.getElementById("pager-status");
+    if (!grid || !pager) { return; }
+
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".proj"));
+    var pageCount = Math.ceil(cards.length / PER_PAGE);
+    if (pageCount < 2) { return; }          /* nothing to paginate */
+
+    var current = 1;
+    var pageInTimer = null;
+    pager.removeAttribute("hidden");
+
+    /* Clearing `page-in` is what makes the fade safe.
+       The animation uses fill-mode:both, which holds the opacity:0 `from`
+       state whenever the animation clock does not advance — a throttled or
+       backgrounded tab, a non-compositing embed. Left alone that renders a
+       BLANK card, which is far worse than a missing fade. Removing the class
+       returns the card to its normal opacity:1, so the fade is decoration and
+       never load-bearing. A no-op when the animation ran normally. */
+    function clearPageIn() {
+      cards.forEach(function (c) {
+        c.classList.remove("page-in");
+        c.style.animationDelay = "";
+      });
+    }
+
+    /* Build the numbered buttons once. Labels are digits, so they need no
+       translation — but the aria-label does. */
+    var numBtns = [];
+    for (var p = 1; p <= pageCount; p++) {
+      (function (n) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "pager-num";
+        b.textContent = String(n);
+        b.addEventListener("click", function () { show(n, true); });
+        pages.appendChild(b);
+        numBtns.push(b);
+      })(p);
+    }
+
+    function show(n, animate) {
+      current = Math.min(Math.max(1, n), pageCount);
+      var first = (current - 1) * PER_PAGE;
+      var visibleIndex = 0;
+
+      cards.forEach(function (card, i) {
+        var on = i >= first && i < first + PER_PAGE;
+        card.hidden = !on;
+        card.classList.remove("page-in");
+        if (on && animate && !reduce) {
+          /* Delay by position among the VISIBLE cards, not DOM index. */
+          card.style.animationDelay = (visibleIndex * 45) + "ms";
+          /* force reflow so the animation restarts on every page change */
+          void card.offsetWidth;
+          card.classList.add("page-in");
+          card.addEventListener("animationend", clearPageIn, { once: true });
+        } else {
+          card.style.animationDelay = "";
+        }
+        if (on) { visibleIndex++; }
+      });
+
+      /* Backstop for the case animationend never fires because the animation
+         never advanced. Runs past the longest possible delay plus duration. */
+      if (pageInTimer) { window.clearTimeout(pageInTimer); }
+      pageInTimer = window.setTimeout(clearPageIn, PER_PAGE * 45 + 800);
+
+      numBtns.forEach(function (b, i) {
+        if (i + 1 === current) { b.setAttribute("aria-current", "page"); }
+        else { b.removeAttribute("aria-current"); }
+        b.setAttribute("aria-label", ui().pageAria.replace("{n}", i + 1));
+      });
+
+      prev.disabled = current === 1;
+      next.disabled = current === pageCount;
+      if (status) {
+        status.textContent = ui().pageOf.replace("{a}", current).replace("{b}", pageCount);
+      }
+    }
+
+    prev.addEventListener("click", function () { show(current - 1, true); goTop(); });
+    next.addEventListener("click", function () { show(current + 1, true); goTop(); });
+    pages.addEventListener("click", function (e) { if (e.target.closest(".pager-num")) { goTop(); } });
+
+    /* Bring the section heading back into view — otherwise a page change
+       leaves the visitor looking at the pager with the new cards above them. */
+    function goTop() {
+      var h = document.getElementById("h-proj");
+      if (h) { h.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }
+    }
+
+    /* Re-label when the language changes. applyLang calls this via the hook. */
+    window.__repaintPager = function () { show(current, false); };
+
+    show(1, false);
+  })();
+
+  /* ── Stat count-up ────────────────────────────────────────────────────
+     Only elements carrying data-count-to animate; ".NET 10" has no such
+     attribute and is left alone. The final value is written unconditionally
+     at the end (and immediately under reduced motion), so the numbers can
+     never be left mid-count. */
+  (function () {
+    var counters = document.querySelectorAll("[data-count-to]");
+    if (!counters.length) { return; }
+
+    function settle(el) {
+      el.textContent = el.getAttribute("data-count-to") + (el.getAttribute("data-count-suffix") || "");
+    }
+
+    if (reduce) {
+      Array.prototype.forEach.call(counters, settle);
+      return;
+    }
+
+    Array.prototype.forEach.call(counters, function (el) {
+      var to = parseInt(el.getAttribute("data-count-to"), 10);
+      var suffix = el.getAttribute("data-count-suffix") || "";
+      if (!isFinite(to)) { return; }
+      var DURATION = 900, started = null, done = false;
+
+      function step(now) {
+        if (started === null) { started = now; }
+        var t = Math.min(1, (now - started) / DURATION);
+        if (t >= 1) { done = true; settle(el); return; }
+        /* ease-out cubic — fast start, gentle landing */
+        el.textContent = Math.round(to * (1 - Math.pow(1 - t, 3))) + suffix;
+        window.requestAnimationFrame(step);
+      }
+
+      /* The element is deliberately NOT zeroed here, only inside the first
+         frame. requestAnimationFrame does not run in a backgrounded tab or a
+         non-compositing embed — and if it never runs, the real number has to
+         stay on screen. "0 years of experience" is a far worse failure than a
+         missing animation. */
+      window.requestAnimationFrame(step);
+
+      /* Backstop: settle regardless once the animation should have finished,
+         so a stalled count can never be left mid-way. */
+      window.setTimeout(function () { if (!done) { settle(el); } }, DURATION + 400);
+    });
+  })();
+
+  /* Copy email — with a graceful fallback for non-secure contexts */
+  var copyBtn = document.getElementById("copy");
+  var note    = document.getElementById("copied");
+
+  function flash(msg) {
+    if (!note) { return; }
+    note.textContent = msg;
+    note.classList.add("show");
+    window.setTimeout(function () { note.classList.remove("show"); }, 2600);
+  }
+
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () {
+      var email = copyBtn.getAttribute("data-email");
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(email).then(
+          function () { flash(ui().copied.replace("{v}", email)); },
+          function () { flash(email); }
+        );
+        return;
+      }
+
+      /* http:// or file:// — no clipboard API available */
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = email;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        flash(ok ? ui().copied.replace("{v}", email) : email);
+      } catch (err) {
+        flash(email);
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
