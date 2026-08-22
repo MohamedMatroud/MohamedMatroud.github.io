@@ -28,13 +28,13 @@ joining between letters.
 and mapped by a single block, so a colour is only ever written in one place. Every
 foreground/surface pair in both themes clears WCAG AA at 4.5:1.
 
-**Thirteen projects, paginated six per page**, grouped so the most recent work leads.
+**Fourteen projects, paginated six per page**, grouped so the most recent work leads.
 
 **A CSS-only 3D hero graphic** — a rotating isometric stack representing Clean Architecture layers,
 leaning toward the cursor. Four nested transforms, no library.
 
 **Progressive enhancement throughout.** Without JavaScript the page is fully readable: all content
-visible, all thirteen projects rendered, the pager hidden rather than leaving cards trapped behind a
+visible, all fourteen projects rendered, the pager hidden rather than leaving cards trapped behind a
 control that can't work. Animations are decoration and never gate visibility — each has a fallback
 that restores the finished state if its animation never runs.
 

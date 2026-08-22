@@ -466,21 +466,26 @@ section{padding-block:var(--gap);scroll-margin-top:74px}
 }
 .proj:hover{border-color:var(--border-lit);transform:translateY(-3px);background:var(--bg-elev-2)}
 
-/* Featured project. Spans the full grid width so its much longer description
-   cannot inflate the height of the cards beside it — CSS Grid equalises row
-   height, and a 468-character scope next to a 100-character one left ~300px of
-   dead space in each neighbour. Alone in its row, it sizes to its own content.
-   Only ever card #1, which only ever appears on page 1, so no conditional
-   logic is needed; at mobile widths the grid is single-column already. */
-.proj.feature{
-  grid-column:1 / -1;
-  border-color:var(--accent-dim);
-  border-inline-start:3px solid var(--accent);
+.proj.collapsible .proj-copy{position:relative}
+.proj.collapsible:not(.expanded) .proj-copy{
+  max-height:8.5rem;overflow:hidden;
 }
-/* At full width a 468-character paragraph would set across ~1000px, which is
-   past readable. Cap the measure; the chips still use the full width. */
-.proj.feature .scope,
-.proj.feature .role{max-width:78ch}
+.proj.collapsible:not(.expanded) .proj-copy::after{
+  content:"";position:absolute;inset-inline:0;bottom:0;height:3.5rem;
+  background:linear-gradient(transparent,var(--bg-elev));pointer-events:none;
+}
+.proj.collapsible:hover:not(.expanded) .proj-copy::after{
+  background:linear-gradient(transparent,var(--bg-elev-2));
+}
+.proj-more{
+  align-self:flex-start;margin:-.15rem 0 1rem;padding:0;border:0;background:none;
+  color:var(--accent);font:600 .76rem var(--mono);cursor:pointer;
+}
+.proj-more:hover{text-decoration:underline;text-underline-offset:3px}
+.proj-more:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:2px}
+.proj-more .less{display:none}
+.proj.collapsible.expanded .proj-more .more{display:none}
+.proj.collapsible.expanded .proj-more .less{display:inline}
 .proj-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.8rem;margin-bottom:.7rem}
 .proj h3{font-size:1.04rem;margin:0;letter-spacing:-.015em;line-height:1.35}
 .tag{
@@ -503,6 +508,9 @@ section{padding-block:var(--gap);scroll-margin-top:74px}
   padding-inline-start:.75rem;border-inline-start:2px solid var(--border-lit);
 }
 .proj .role b{color:var(--text-dim);font-weight:600}
+.proj-link{align-self:flex-start;margin:0 0 1.1rem;font-family:var(--mono);font-size:.78rem;color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-dim);transition:color .18s,border-color .18s}
+.proj-link:hover{color:var(--accent-2);border-color:var(--accent-2)}
+.proj-link:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:2px}
 /* Inline code (API route names). Isolated in RTL so a Latin path can't reorder. */
 .proj .role code{
   font-family:var(--mono);font-size:.9em;
@@ -513,7 +521,7 @@ section{padding-block:var(--gap);scroll-margin-top:74px}
 
 /* ── Pager ────────────────────────────────────────────────────────────────
    The pager carries `hidden` in the markup and is only revealed when the `js`
-   class is present. Without JavaScript all twelve cards stay rendered and this
+   class is present. Without JavaScript all fourteen cards stay rendered and this
    control never appears — content is never trapped behind a dead button. */
 .pager{display:none}
 .js .pager{
@@ -546,8 +554,8 @@ section{padding-block:var(--gap);scroll-margin-top:74px}
 :root[dir="rtl"] .pager-status{font-family:var(--sans-ar)}
 
 /* Page-change fade. Deliberately NOT reusing the .stagger delays: those are
-   keyed to nth-child across all twelve cards, so page 2 would inherit delays
-   from DOM position and cards 10–12 fall outside the 1–9 rules entirely.
+   keyed to nth-child across all fourteen cards, so later pages would inherit delays
+   from DOM position and cards 10–14 fall outside the 1–9 rules entirely.
    JS sets the delay per VISIBLE index instead. */
 @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .js .proj.page-in{animation:pageIn .42s ease both}
@@ -836,9 +844,9 @@ footer a{color:var(--text-dim)}
          the fourth stat is ".NET 10" and must not be counted. -->
     <div class="quickfacts">
       <div class="qf"><div class="n ltr" data-count-to="5" data-count-suffix="+">5+</div><div class="l" data-i18n="hero.qfYears">Years .NET</div></div>
-      <!-- "Projects delivered", not "Production systems": three of the twelve
+      <!-- "Projects delivered", not "Production systems": three of the fourteen
            are freelance front-end contracts and would not survive that label. -->
-      <div class="qf"><div class="n ltr" data-count-to="13">13</div><div class="l" data-i18n="hero.qfSystems">Projects delivered</div></div>
+      <div class="qf"><div class="n ltr" data-count-to="14">14</div><div class="l" data-i18n="hero.qfSystems">Projects delivered</div></div>
       <div class="qf"><div class="n ltr" data-count-to="4">4</div><div class="l" data-i18n="hero.qfDomains">Enterprise domains</div></div>
       <div class="qf"><div class="n ltr">.NET 10</div><div class="l" data-i18n="hero.qfStack">Current stack</div></div>
     </div>
@@ -1086,7 +1094,7 @@ footer a{color:var(--text-dim)}
 
     <!-- Flagship, deliberately first: multi-tenant, split-deployment, .NET 8 +
          React 18. It is the strongest thing on the page. -->
-    <article class="proj feature">
+    <article class="proj">
       <div class="proj-top">
         <h3 data-i18n="proj.p13name">Nova Visitors — Community Access Platform</h3>
         <span class="tag" data-i18n="proj.p13tag">Multi-tenant</span>
@@ -1096,6 +1104,23 @@ footer a{color:var(--text-dim)}
       <p class="role" data-i18n-html="proj.p13role"><b>My contribution:</b> backend and frontend developer — designed the split-deployment dependency injection, built the <code>/CentralOwnerSync</code> HTTP surface, added the persons filter page, and delivered the bilingual RTL rework.</p>
       <div class="chips">
         <span class="chip hot">.NET 8</span><span class="chip hot">ASP.NET Core</span><span class="chip">EF Core 8</span><span class="chip">SQL Server 2022</span><span class="chip hot">React 18</span><span class="chip">Vite</span><span class="chip">MUI v7</span><span class="chip">JWT</span><span class="chip hot">Docker</span><span class="chip">NetTopologySuite</span>
+      </div>
+    </article>
+
+    <article class="proj collapsible">
+      <div class="proj-top">
+        <h3 data-i18n="proj.p14name">E-Commerce Clean Architecture API</h3>
+        <span class="tag" data-i18n="proj.p14tag">Open source</span>
+      </div>
+      <p class="proj-co"><span class="ci" aria-hidden="true">◆</span><span data-i18n="proj.p14co">Personal project</span></p>
+      <div class="proj-copy" id="proj-p14-copy">
+        <p class="scope" data-i18n="proj.p14scope">A production-oriented ASP.NET Core 9 e-commerce API for catalog browsing, customer accounts, carts, checkout, orders, and fine-grained administration. Clean Architecture keeps domain, application, infrastructure, and API concerns independently testable, while CQRS and scoped role permissions make business operations explicit and secure.</p>
+        <p class="role" data-i18n-html="proj.p14role"><b>Engineering highlights:</b> JWT authentication, resource/action permissions, category-scoped admin access, unified API responses, rate limiting, health checks, Swagger, automatic migrations, and unit, integration, and architecture tests.</p>
+      </div>
+      <button class="proj-more" type="button" aria-expanded="false" aria-controls="proj-p14-copy"><span class="more" data-i18n="proj.readMore">Read more ↓</span><span class="less" data-i18n="proj.readLess">Show less ↑</span></button>
+      <a class="proj-link ltr" href="https://github.com/MohamedMatroud/ecommerce-clean-architecture-api" target="_blank" rel="noopener noreferrer" data-i18n="proj.viewGithub">View source on GitHub ↗</a>
+      <div class="chips">
+        <span class="chip hot">.NET 9</span><span class="chip hot">ASP.NET Core</span><span class="chip hot">Clean Architecture</span><span class="chip">CQRS</span><span class="chip">EF Core</span><span class="chip">SQL Server</span><span class="chip">JWT</span><span class="chip">FluentValidation</span><span class="chip">xUnit</span>
       </div>
     </article>
 
@@ -1179,7 +1204,7 @@ footer a{color:var(--text-dim)}
 
     <!-- ── page 2 ───────────────────────────────────────────────────────
          Everything below is hidden by the pager on load. The hiding is done
-         in JS behind the `.js` class, so without JavaScript all twelve cards
+         in JS behind the `.js` class, so without JavaScript all fourteen cards
          render and the pager is hidden instead — content is never trapped
          behind a control that cannot work. -->
 
@@ -1478,6 +1503,14 @@ footer a{color:var(--text-dim)}
     "proj.p13co":"لدى دايناميك بيزنس سوليوشن (Dynamic Business Solution)",
     "proj.p13scope":"منصة متكاملة للمجمّعات السكنية المغلقة تغطي تسجيل المُلّاك ومصادقة السكان وسجلات الوحدات والأشخاص والزيارات ولوحات التحكم الإدارية. تعمل بنشر منقسم — خادم لكل قرية يحتفظ بالبيانات المحلية، مع سجل مركزي مشترك يزامن هويات المُلّاك والتقارير العابرة للقرى عبر HTTP، مع عزل كل قرية في قاعدة بيانات SQL Server خاصة بها. وتضيف تحديد النطاق الجغرافي بالمضلّعات، وتفعيلًا مرتبطًا ببصمة الجهاز، وواجهة ثنائية اللغة.",
     "proj.p13role":"<b>مساهمتي:</b> مطوّر للواجهات الخلفية والأمامية — صمّمتُ حقن التبعيات للنشر المنقسم، وبنيتُ واجهة <code>/CentralOwnerSync</code>، وأضفتُ صفحة تصفية الأشخاص، ونفّذتُ إعادة بناء الواجهة ثنائية اللغة بدعم كامل للاتجاه من اليمين إلى اليسار.",
+    "proj.p14name":"واجهة متجر إلكتروني بالمعمارية النظيفة",
+    "proj.p14tag":"مفتوح المصدر",
+    "proj.p14co":"مشروع شخصي",
+    "proj.p14scope":"واجهة برمجية لمتجر إلكتروني جاهزة بأسلوب إنتاجي باستخدام ASP.NET Core 9، تغطي تصفح المنتجات وحسابات العملاء وسلة التسوق والدفع والطلبات والإدارة الدقيقة. تفصل المعمارية النظيفة بين المجال والتطبيق والبنية التحتية وواجهة API بما يجعل كل طبقة قابلة للاختبار بصورة مستقلة، بينما تجعل CQRS وصلاحيات الأدوار المقيّدة عمليات الأعمال واضحة وآمنة.",
+    "proj.p14role":"<b>أبرز الجوانب الهندسية:</b> مصادقة JWT، وصلاحيات حسب المورد والإجراء، وتقييد وصول المسؤول حسب الفئة، واستجابات API موحّدة، وتحديد معدل الطلبات، وفحوصات الصحة، وSwagger، والترحيلات التلقائية، واختبارات الوحدة والتكامل والمعمارية.",
+    "proj.readMore":"اقرأ المزيد ↓",
+    "proj.readLess":"عرض أقل ↑",
+    "proj.viewGithub":"عرض المصدر على GitHub ↗",
     "proj.p1co":"لدى دايناميك بيزنس سوليوشن (Dynamic Business Solution)",
     "proj.p2co":"لدى دايناميك بيزنس سوليوشن (Dynamic Business Solution)",
     "proj.p3co":"لدى ألتيميت سوليوشنز (Ultimate Solutions)",
@@ -1655,6 +1688,35 @@ footer a{color:var(--text-dim)}
      English is not stored in a dictionary — it is snapshotted from the markup
      on load. Switching back is therefore a restore, not a second copy of the
      text that could silently drift out of sync with the page. */
+
+  /* Build the same compact, expandable description control for every project.
+     Doing this before the translation snapshot keeps the generated labels
+     bilingual. Without JavaScript, the original paragraphs remain fully visible. */
+  document.querySelectorAll(".projects .proj").forEach(function (card, index) {
+    card.classList.add("collapsible");
+    if (card.querySelector(":scope > .proj-copy")) { return; }
+
+    var scope = card.querySelector(":scope > .scope");
+    var role  = card.querySelector(":scope > .role");
+    if (!scope || !role) { return; }
+
+    var copy = document.createElement("div");
+    copy.className = "proj-copy";
+    copy.id = "project-copy-" + (index + 1);
+    card.insertBefore(copy, scope);
+    copy.appendChild(scope);
+    copy.appendChild(role);
+
+    var button = document.createElement("button");
+    button.className = "proj-more";
+    button.type = "button";
+    button.setAttribute("aria-expanded", "false");
+    button.setAttribute("aria-controls", copy.id);
+    button.innerHTML = '<span class="more" data-i18n="proj.readMore">Read more ↓</span>' +
+      '<span class="less" data-i18n="proj.readLess">Show less ↑</span>';
+    copy.insertAdjacentElement("afterend", button);
+  });
+
   var langBtn = document.getElementById("lang-toggle");
   var i18nEls = Array.prototype.slice.call(
     document.querySelectorAll("[data-i18n],[data-i18n-html],[data-i18n-aria],[data-i18n-title]")
@@ -1850,9 +1912,19 @@ footer a{color:var(--text-dim)}
     if (hero) { hero.classList.add("anim-done"); }
   }, 1600);
 
+  /* Keep every project compact until the visitor asks for more detail. */
+  document.querySelectorAll(".proj-more").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var card = button.closest(".proj.collapsible");
+      if (!card) { return; }
+      var expanded = card.classList.toggle("expanded");
+      button.setAttribute("aria-expanded", String(expanded));
+    });
+  });
+
   /* ── Project pagination ───────────────────────────────────────────────
      Six per page. Everything here runs only because JS is alive; the pager
-     starts `hidden` in the markup and all twelve cards start visible, so a
+     starts `hidden` in the markup and all fourteen cards start visible, so a
      no-JS visitor simply gets the full grid and no control. */
   (function () {
     var PER_PAGE = 6;
